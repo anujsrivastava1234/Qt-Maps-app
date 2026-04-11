@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/Resources">
+        <file>AppIcon.png</file>
+        <file>drawer.png</file>
+        <file>darkMode.svg</file>
+        <file>donwload.svg</file>
+        <file>Help.svg</file>
+        <file>Marker.svg</file>
+        <file>offline.svg</file>
+        <file>profile.svg</file>
+        <file>saved.svg</file>
+        <file>Settings.svg</file>
+    </qresource>
+</RCC>
