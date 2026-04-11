@@ -45,6 +45,16 @@ ApplicationWindow {
         }
     }
 
+    // This overlay sits on top of everything
+    DownloadMapPrompt {
+        id: downloadPrompt
+        anchors.fill: parent
+        model: appBackend
+        z: 1000
+        isVisible: false
+    }
+
+
     Item {
         id: contentRoot
         anchors.fill: parent
@@ -53,14 +63,6 @@ ApplicationWindow {
             id: appBackend
         }
 
-        // This overlay sits on top of everything
-        DownloadMapPrompt {
-            id: downloadPrompt
-            anchors.fill: parent
-            model: appBackend
-            z: 1000
-            isVisible: false
-        }
 
         Rectangle{
             id: containerId
@@ -574,7 +576,7 @@ ApplicationWindow {
         anchors.fill: parent
         sourceItem: contentRoot
         live: true
-        visible: blurOverlay.visible
+        visible:  drawer.opened || downloadPrompt.isVisible
     }
 
     FastBlur {
@@ -582,7 +584,7 @@ ApplicationWindow {
         anchors.fill: parent
         source: effectSource
         radius: 40
-        visible: false
+        visible: drawer.opened || downloadPrompt.isVisible
         z: 500   // below drawer
     }
 }
