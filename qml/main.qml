@@ -1,11 +1,13 @@
 import QtCore
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import QtQuick.Controls
-import QtQuick.Controls.impl
 import Esri.CompanionApp
+import QtQuick.Controls.impl
 import Qt5Compat.GraphicalEffects
 import "Components"
+
 ApplicationWindow {
     id: windowId
     visible: true
@@ -100,7 +102,7 @@ ApplicationWindow {
 
         Drawer {
             id: drawer
-            width: windowId.width * 0.75
+            width: windowId.width * 0.85
             height: windowId.height
             onClosed: {
                 blurOverlay.visible = false
@@ -113,11 +115,106 @@ ApplicationWindow {
             }
             ColumnLayout {
                 anchors.fill: parent
-                anchors.left: parent.Left
-                anchors.right: parent.Right
-                anchors.leftMargin: 2
-                anchors.rightMargin: 2
+                anchors.margins: 5
 
+                //Profile layout
+                RowLayout{
+                    Layout.fillWidth: true
+                    Layout.margins: 10
+
+                    Rectangle{
+                        id: profileIconRectId
+                        width: 40
+                        height: 40
+                        radius: 20
+                        color: "#26262b"
+                        IconImage {
+                            id: profileIcon
+                            sourceSize.height: parent.height * 0.4
+                            sourceSize.width: parent.width * 0.4
+                            fillMode: Image.PreserveAspectFit
+                            anchors.centerIn: parent
+                            color: "#0affe6"
+                            source: "qrc:/Resources/profile.svg"
+                        }
+                    }
+                    MultiEffect {
+                        source: profileIconRectId
+                        anchors.fill: profileIconRectId
+                        shadowBlur: 0.5
+                        shadowEnabled: true
+                        shadowColor: "#0affe6"
+                        shadowVerticalOffset: 0.5
+                        shadowHorizontalOffset: 0.5
+                    }
+                    ColumnLayout{
+                        id: profileSectionId
+                        anchors.left: profileIconRectId.right
+                        anchors.leftMargin: 8
+                        spacing: 0.1
+                        Text {
+                            id: nameId
+                            text: qsTr("Alex Rivera")
+                            font.bold: true
+                            font.pointSize: 14
+                            color: "#e6e9ee"
+                        }
+                        Text {
+                            id: emailId
+                            text: qsTr("alex@gmail.com")
+                            color: "#727885"
+                        }
+                    }
+                    Rectangle{
+                        width: 24
+                        height: 24
+                        anchors.left: profileSectionId.right
+                        anchors.leftMargin: 60
+                        Layout.alignment: Qt.AlignRight
+                        color: "transparent"
+                        IconImage{
+                            sourceSize.width: parent.width
+                            sourceSize.height: parent.height
+                            source: "qrc:/Resources/close.svg"
+                            fillMode: Image.PreserveAspectFit
+                            color: "#9CA3AF"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: function(){
+                                drawer.close()
+                            }
+                        }
+                    }
+                }
+
+                RowLayout{
+                    Layout.fillWidth: true
+                    Layout.margins: 5
+                    spacing: 5
+                    StatsSection{
+                        statsNumber: 24
+                        statsName: "Saved"
+                        statsHeight: 50
+                        statsWidth: 80
+                    }
+                    StatsSection{
+                        statsNumber: 8
+                        statsName: "Routes"
+                        statsHeight: 50
+                        statsWidth: 80
+                    }
+                    StatsSection{
+                        statsNumber: 3
+                        statsName: "Offline"
+                        statsHeight: 50
+                        statsWidth: 80
+                    }
+                }
+
+                //divider
+                Divider{}
+                //Profile Btn
                 IconButton{
                     id: profileBtn
                     btnWidth: parent.width
@@ -128,7 +225,7 @@ ApplicationWindow {
                         console.log("Profile Button is clicked")
                     }
                 }
-
+                //saved places
                 IconButton{
                     id: savedBtn
                     btnWidth: parent.width
@@ -139,7 +236,7 @@ ApplicationWindow {
                         console.log("Saved Place Btn is clicked")
                     }
                 }
-
+                //track mode
                 IconButton{
                     id: trackModeBtn
                     btnWidth: parent.width
@@ -158,9 +255,6 @@ ApplicationWindow {
                         }
                     }
                 }
-
-
-
                 //offline maps
                 Rectangle {
                     id: offlineSection
@@ -244,7 +338,6 @@ ApplicationWindow {
                     }
 
                 }
-
                 //darkMode
                 Rectangle {
                     id: darkModeSection
@@ -331,14 +424,8 @@ ApplicationWindow {
                     }
 
                 }
-
                 //divider
-                Rectangle{
-                    width: parent.width
-                    height: 1
-                    color: "#303035"
-                }
-
+                Divider{}
                 //Settings
                 IconButton{
                     id: settingsId
@@ -355,21 +442,19 @@ ApplicationWindow {
                     iconSource: "qrc:/Resources/Help.svg"
                     buttonName: qsTr("Help & Support ")
                 }
-
                 Item { Layout.fillHeight: true }
-
                 Rectangle {
                     id: downloadMapButton
                     width: parent.width
-                    height: 45
+                    height: 40
                     radius: 13
 
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    anchors.leftMargin: 5
-                    anchors.rightMargin: 5
-                    anchors.bottomMargin: 5
+                    anchors.leftMargin: 7
+                    anchors.rightMargin: 7
+                    anchors.bottomMargin: 10
 
                     property bool hovered: false
                     property bool pressed: false
@@ -386,8 +471,8 @@ ApplicationWindow {
                         anchors.centerIn: parent
 
                         Rectangle {
-                            width: 15
-                            height: 15
+                            width: 12
+                            height: 12
                             anchors.verticalCenter: parent.verticalCenter
                             color: "transparent"
 
@@ -404,8 +489,7 @@ ApplicationWindow {
                             id: name
                             anchors.verticalCenter: parent.verticalCenter
                             text: qsTr("Download New Maps")
-                            font.bold: true
-                            font.pointSize: 18
+                            font.pointSize: 12
                             color: "#09090b"
                         }
 

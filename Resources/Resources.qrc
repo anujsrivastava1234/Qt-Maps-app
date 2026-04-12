@@ -10,5 +10,6 @@
         <file>profile.svg</file>
         <file>saved.svg</file>
         <file>Settings.svg</file>
+        <file>close.svg</file>
     </qresource>
 </RCC>
