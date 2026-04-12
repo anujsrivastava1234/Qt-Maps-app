@@ -94,7 +94,7 @@ ApplicationWindow {
         }
         Drawer {
             id: drawer
-            width: windowId.width * 0.85
+            width: windowId.width * 0.75
             height: windowId.height
             onClosed: {
                 blurOverlay.visible = false
@@ -107,6 +107,7 @@ ApplicationWindow {
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 5
+                anchors.horizontalCenter: parent
                 //Profile layout
                 RowLayout{
                     Layout.fillWidth: true
