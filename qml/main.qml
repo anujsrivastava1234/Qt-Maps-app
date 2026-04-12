@@ -16,28 +16,22 @@ ApplicationWindow {
 
     LocationPermission{
         id: locationPermission
-
     }
 
     Rectangle {
         id: permissionRequestItem
         anchors.fill: parent
         visible: false
-
         Text {
             anchors.centerIn: parent
             text: qsTr("We need your permission to access the Location."
                        + "Please tap this screen to request permission.")
-
         }
-
         MouseArea {
             anchors.fill: parent
             onClicked: locationPermission.request()
         }
     }
-
-
 
     header: Rectangle {
         color:  "#1d1d20"
@@ -92,14 +86,12 @@ ApplicationWindow {
             id: appBackend
         }
 
-
         Rectangle{
             id: containerId
             anchors.fill: parent
             z: 1000
             color: "transparent"
         }
-
         Drawer {
             id: drawer
             width: windowId.width * 0.85
@@ -108,7 +100,6 @@ ApplicationWindow {
                 blurOverlay.visible = false
                 effectSource.visible = false
             }
-
             Rectangle{
                 anchors.fill: parent
                 color: "#1d1d20"
@@ -116,7 +107,6 @@ ApplicationWindow {
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 5
-
                 //Profile layout
                 RowLayout{
                     Layout.fillWidth: true
@@ -433,7 +423,70 @@ ApplicationWindow {
                     btnWidth: parent.width
                     iconSource: "qrc:/Resources/Settings.svg"
                     buttonName: qsTr("Settings")
+                    actionIcon: "qrc:/Resources/right.svg"
+                    onBtnClicked: function(){
+                        if(mapTypeSection.visible)
+                        {
+                            mapTypeSection.visible = false
+                            settingsId.actionIcon = "qrc:/Resources/right.svg"
+                        }else{
+                            mapTypeSection.visible = true
+                            settingsId.actionIcon = "qrc:/Resources/down.svg"
+                        }
+
+
+
+                    }
                 }
+                RowLayout{
+                    id: mapTypeSection
+                    Layout.fillWidth: true
+                    visible: false
+                    MapButton{
+                        id: standardBtnId
+                        btnName: "Standard"
+                        iconName: "qrc:/Resources/standard.svg"
+                        btnHeight: 50
+                        btnWidth: 80
+                        isSelected: true
+                        onBtnClicked: {
+                            appBackend.mapType = 0
+                            sateliteBtnId.isSelected = false
+                            terrainBtnId.isSelected = false
+                            standardBtnId.isSelected = true
+                        }
+                    }
+                    MapButton{
+                        id: sateliteBtnId
+                        btnName: "Satellite"
+                        iconName: "qrc:/Resources/satellite.svg"
+                        btnHeight: 50
+                        btnWidth: 80
+                        isSelected: false
+                        onBtnClicked: {
+                            appBackend.mapType = 1
+                            standardBtnId.isSelected = false
+                            terrainBtnId.isSelected = false
+                            sateliteBtnId.isSelected = true
+                        }
+                    }
+                    MapButton{
+                        id: terrainBtnId
+                        btnName: "Terrain"
+                        iconName: "qrc:/Resources/terrain.svg"
+                        btnHeight: 50
+                        btnWidth: 80
+                        isSelected: false
+                        onBtnClicked: {
+                            appBackend.mapType = 2
+                            standardBtnId.isSelected = false
+                            sateliteBtnId.isSelected = false
+                            terrainBtnId.isSelected = true
+                        }
+                    }
+                }
+
+
                 //Help and Support
                 IconButton{
                     id: helpAndSupportId

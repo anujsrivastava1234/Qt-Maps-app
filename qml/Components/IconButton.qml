@@ -7,6 +7,7 @@ Item {
     id: root
     property string iconSource: ""
     property string buttonName: ""
+    property string actionIcon: ""
     property int btnWidth: 0
     property int btnHeight: 0
     anchors.leftMargin: 2
@@ -48,6 +49,19 @@ Item {
             }
             Item {
                 Layout.fillWidth: true
+            }
+            Item {
+                width: 15
+                height: 15
+                IconImage {
+                    id: actionIconId
+                    anchors.centerIn: parent
+                    source: root.actionIcon
+                    sourceSize.width: 15
+                    sourceSize.height: 15
+                    fillMode: Image.PreserveAspectFit
+                    color: "#9CA3AF"
+                }
             }
         }
         MouseArea {
