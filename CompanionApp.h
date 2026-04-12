@@ -72,6 +72,8 @@ public:
     int mapType() const;
     void setMapType(int newMapType);
 
+    void updateBaseMap();
+
 signals:
     void mapViewChanged();
     void isTrackingChanged();

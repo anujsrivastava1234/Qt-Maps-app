@@ -178,7 +178,7 @@ void CompanionApp::setNightModeEnabled(bool newNightModeEnabled)
     if (m_nightModeEnabled == newNightModeEnabled)
         return;
     m_nightModeEnabled = newNightModeEnabled;
-    setMapType(m_mapType);
+    updateBaseMap();
     emit nightModeEnabledChanged();
 }
 
@@ -205,17 +205,7 @@ void CompanionApp::setOfflineModeEnabled(bool newOfflineModeEnabled)
     if (m_offlineModeEnabled == newOfflineModeEnabled)
         return;
     m_offlineModeEnabled = newOfflineModeEnabled;
-    if(newOfflineModeEnabled)
-    {
-        auto vtlkLayer = new ArcGISVectorTiledLayer(vtpkFileName, this);
-        m_map->setBasemap(new Basemap(vtlkLayer, this));
-    }else{
-        if(m_nightModeEnabled){
-            m_map->setBasemap(new Basemap(BasemapStyle::OsmNavigationDark));
-        }else{
-             m_map->setBasemap(new Basemap(BasemapStyle::OsmNavigation));
-        }
-    }
+    updateBaseMap();
     emit offlineModeEnabledChanged();
 }
 
@@ -230,44 +220,43 @@ void CompanionApp::setMapType(int newMapType)
         return;
 
     m_mapType = newMapType;
+    updateBaseMap();
+    emit mapTypeChanged();
+}
+
+void CompanionApp::updateBaseMap()
+{
+    // If we are in offline mode, we stay on the local VTPK
+    if (m_offlineModeEnabled)
+    {
+        if (QFile::exists(vtpkFileName)) {
+            auto vtlkLayer = new ArcGISVectorTiledLayer(vtpkFileName, this);
+            m_map->setBasemap(new Basemap(vtlkLayer, this));
+        }
+        return;
+    }
+
     BasemapStyle style;
     if (m_nightModeEnabled)
     {
-
         switch (m_mapType)
         {
-        case 0:
-            style = BasemapStyle::ArcGISNavigationNight;
-            break;
-
-        case 1:
-            style = BasemapStyle::ArcGISImageryStandard;
-            break;
-
-        case 2:
-            style = BasemapStyle::ArcGISTerrainDetail;
-            break;
+        case 0:  style = BasemapStyle::ArcGISNavigationNight; break;
+        case 1:  style = BasemapStyle::ArcGISImageryStandard; break; // Imagery usually doesn't have a night mode
+        case 2:  style = BasemapStyle::ArcGISTerrainDetail;    break;
+        default: style = BasemapStyle::ArcGISNavigationNight; break;
         }
     }
     else
     {
         switch (m_mapType)
         {
-        case 0:
-            style = BasemapStyle::ArcGISNavigation;
-            break;
-
-        case 1:
-            style = BasemapStyle::ArcGISImageryStandard;
-            break;
-
-        case 2:
-            style = BasemapStyle::ArcGISTerrain;
-            break;
+        case 0:  style = BasemapStyle::ArcGISNavigation; break;
+        case 1:  style = BasemapStyle::ArcGISImageryStandard; break;
+        case 2:  style = BasemapStyle::ArcGISTerrain; break;
+        default: style = BasemapStyle::ArcGISNavigation; break;
         }
     }
 
     m_map->setBasemap(new Basemap(style, this));
-
-    emit mapTypeChanged();
 }
