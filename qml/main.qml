@@ -13,7 +13,7 @@ ApplicationWindow {
     height: 640
 
     LocationPermission{
-         id: locationPermission
+        id: locationPermission
 
     }
 
@@ -25,7 +25,7 @@ ApplicationWindow {
         Text {
             anchors.centerIn: parent
             text: qsTr("We need your permission to access the Location."
-                + "Please tap this screen to request permission.")
+                       + "Please tap this screen to request permission.")
 
         }
 
@@ -159,17 +159,7 @@ ApplicationWindow {
                     }
                 }
 
-                IconButton{
-                    id: downloadModeBtn
-                    btnWidth: parent.width
-                    btnHeight: 40
-                    iconSource: "qrc:/Resources/donwload.svg"
-                    buttonName:  qsTr("Download Maps")
-                    onBtnClicked: function(){
-                        downloadPrompt.isVisible = true
-                        drawer.close()
-                    }
-                }
+
 
                 //offline maps
                 Rectangle {
@@ -342,6 +332,13 @@ ApplicationWindow {
 
                 }
 
+                //divider
+                Rectangle{
+                    width: parent.width
+                    height: 1
+                    color: "#303035"
+                }
+
                 //Settings
                 IconButton{
                     id: settingsId
@@ -360,6 +357,75 @@ ApplicationWindow {
                 }
 
                 Item { Layout.fillHeight: true }
+
+                Rectangle {
+                    id: downloadMapButton
+                    width: parent.width
+                    height: 45
+                    radius: 13
+
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: 5
+                    anchors.rightMargin: 5
+                    anchors.bottomMargin: 5
+
+                    property bool hovered: false
+                    property bool pressed: false
+
+                    color: pressed ? "#00cbb5" : hovered ? "#00e0cc" : "#00ffe6"
+                    scale: pressed ? 0.97 : 1.0
+
+                    Behavior on color { ColorAnimation { duration: 120 } }
+                    Behavior on scale { NumberAnimation { duration: 100 } }
+
+                    RowLayout {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        anchors.centerIn: parent
+
+                        Rectangle {
+                            width: 15
+                            height: 15
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: "transparent"
+
+                            IconImage {
+                                color: "#09090b"
+                                sourceSize.width: parent.width
+                                sourceSize.height: parent.height
+                                source: "qrc:/Resources/donwload.svg"
+                                fillMode: Image.PreserveAspectFit
+                            }
+                        }
+
+                        Text {
+                            id: name
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: qsTr("Download New Maps")
+                            font.bold: true
+                            font.pointSize: 18
+                            color: "#09090b"
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+
+                            onEntered: downloadMapButton.hovered = true
+                            onExited: downloadMapButton.hovered = false
+
+                            onPressed: downloadMapButton.pressed = true
+                            onReleased: downloadMapButton.pressed = false
+
+                            onClicked: function() {
+                                downloadPrompt.isVisible = true
+                                drawer.close()
+                            }
+                        }
+                    }
+                }
             }
 
         }

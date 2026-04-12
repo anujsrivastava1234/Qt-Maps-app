@@ -71,8 +71,14 @@ Item {
                 iconId.color = "#9CA3AF"
                 textId.color = "#E5E7EB"
                 textId.font.pixelSize = 14
+                drawerBtn.border.width = 0
             }
-            onPressed: drawerBtn.color = "#111827"
+            onPressed: {
+                iconId.color = "#0affe6"
+                textId.color = "#0affe6"
+                drawerBtn.border.width = 0.5
+                drawerBtn.border.color = "#0affe6"
+            }
             onReleased: drawerBtn.color = containsMouse ? "#1F2937" : "transparent"
 
             cursorShape: Qt.PointingHandCursor
