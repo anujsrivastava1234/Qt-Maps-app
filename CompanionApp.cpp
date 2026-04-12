@@ -68,7 +68,7 @@ void CompanionApp::createOfflineAreaFromExtend()
 
 CompanionApp::CompanionApp(QObject *parent /* = nullptr */)
     : QObject(parent)
-    , m_map(new Map(BasemapStyle::OsmNavigation, this))
+    , m_map(new Map(BasemapStyle::ArcGISNavigation, this))
 {}
 
 CompanionApp::~CompanionApp() = default;
@@ -179,9 +179,9 @@ void CompanionApp::setNightModeEnabled(bool newNightModeEnabled)
         return;
     m_nightModeEnabled = newNightModeEnabled;
     if (newNightModeEnabled)
-        m_map->setBasemap(new Basemap(BasemapStyle::OsmNavigationDark));
+        m_map->setBasemap(new Basemap(BasemapStyle::ArcGISNavigationNight));
     else
-        m_map->setBasemap(new Basemap(BasemapStyle::OsmNavigation));
+        m_map->setBasemap(new Basemap(BasemapStyle::ArcGISNavigation));
 
     emit nightModeEnabledChanged();
 }
