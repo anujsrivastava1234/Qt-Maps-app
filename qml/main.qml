@@ -5,7 +5,7 @@ import QtQuick.Controls
 import QtQuick.Controls.impl
 import Esri.CompanionApp
 import Qt5Compat.GraphicalEffects
-
+import "Components"
 ApplicationWindow {
     id: windowId
     visible: true
@@ -113,212 +113,63 @@ ApplicationWindow {
             }
             ColumnLayout {
                 anchors.fill: parent
-                //Profile
-                Rectangle {
-                    id: profileSection
-                    width: parent.width
-                    height: 48
-                    radius: 12
-                    color: "transparent"
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 16
-                        anchors.rightMargin: 16
-                        spacing: 12
-                        Item {
-                            width: 24
-                            height: 24
-                            IconImage {
-                                anchors.centerIn: parent
-                                source: "qrc:/Resources/profile.svg"
-                                sourceSize.width: 20
-                                sourceSize.height: 20
-                                fillMode: Image.PreserveAspectFit
-                                color: "#9CA3AF"
-                            }
-                        }
-                        Text {
-                            text: qsTr("Profile")
-                            font.pixelSize: 14
-                            color: "#E5E7EB"
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                        }
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
+                anchors.left: parent.Left
+                anchors.right: parent.Right
+                anchors.leftMargin: 2
+                anchors.rightMargin: 2
 
-                        onEntered: profileSection.color = "#1F2937"   // subtle hover
-                        onExited: profileSection.color = "transparent"
-
-                        onPressed: profileSection.color = "#111827"
-                        onReleased: profileSection.color = containsMouse ? "#1F2937" : "transparent"
-
-                        cursorShape: Qt.PointingHandCursor
+                IconButton{
+                    id: profileBtn
+                    btnWidth: parent.width
+                    btnHeight: 40
+                    iconSource: "qrc:/Resources/profile.svg"
+                    buttonName: qsTr("Profile")
+                    onBtnClicked: function(){
+                        console.log("Profile Button is clicked")
                     }
                 }
 
-                //Saved
-                Rectangle {
-                    id: savedSection
-                    width: parent.width
-                    height: 48
-                    radius: 12
-                    color: "transparent"
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 16
-                        anchors.rightMargin: 16
-                        spacing: 12
-                        Item {
-                            width: 24
-                            height: 24
-                            IconImage {
-                                anchors.centerIn: parent
-                                source: "qrc:/Resources/saved.svg"
-                                sourceSize.width: 20
-                                sourceSize.height: 20
-                                fillMode: Image.PreserveAspectFit
-                                color: "#9CA3AF"
-                            }
-                        }
-                        Text {
-                            text: qsTr("Saved Places")
-                            font.pixelSize: 14
-                            color: "#E5E7EB"
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                        }
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-
-                        onEntered:savedSection.color = "#1F2937"   // subtle hover
-                        onExited: savedSection.color = "transparent"
-
-                        onPressed: savedSection.color = "#111827"
-                        onReleased:savedSection.color = containsMouse ? "#1F2937" : "transparent"
-
-                        cursorShape: Qt.PointingHandCursor
+                IconButton{
+                    id: savedBtn
+                    btnWidth: parent.width
+                    btnHeight: 40
+                    iconSource: "qrc:/Resources/saved.svg"
+                    buttonName: qsTr("Saved Places")
+                    onBtnClicked: function(){
+                        console.log("Saved Place Btn is clicked")
                     }
                 }
 
-                //Track Location
-                Rectangle {
-                    id: trackModeSection
-                    width: parent.width
-                    height: 48
-                    radius: 12
-                    color: "transparent"
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 16
-                        anchors.rightMargin: 16
-                        spacing: 12
-                        Item {
-                            width: 24
-                            height: 24
-                            IconImage {
-                                anchors.centerIn: parent
-                                source: "qrc:/Resources/Marker.svg"
-                                sourceSize.width: 20
-                                sourceSize.height: 20
-                                fillMode: Image.PreserveAspectFit
-                                color: "#0aedb2"
-                            }
-                        }
-                        Text {
-                            text: qsTr("Track Phone")
-                            font.pixelSize: 14
-                            color: "#0aedb2"
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                        }
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: {
-                            if(appBackend.isTracking)
-                            {
-                                appBackend.isTracking = false
-                            }else{
-                                appBackend.isTracking = true
-                            }
-
-                        }
-
-                        onEntered:  trackModeSection.color = "#1F2937"   // subtle hover
-                        onExited:  trackModeSection.color = "transparent"
-
-                        onPressed:  trackModeSection.color = "#111827"
-                        onReleased: trackModeSection.color = containsMouse ? "#1F2937" : "transparent"
-
-                        cursorShape: Qt.PointingHandCursor
-                    }
-                }
-
-                //Download Map
-                Rectangle {
-                    id: downloadSection
-                    width: parent.width
-                    height: 48
-                    radius: 12
-                    color: "transparent"
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 16
-                        anchors.rightMargin: 16
-                        spacing: 12
-                        Item {
-                            width: 24
-                            height: 24
-                            IconImage {
-                                anchors.centerIn: parent
-                                source: "qrc:/Resources/donwload.svg"
-                                sourceSize.width: 20
-                                sourceSize.height: 20
-                                fillMode: Image.PreserveAspectFit
-                                color: "#0aedb2"
-                            }
-                        }
-                        Text {
-                            text: qsTr("Download Maps")
-                            font.pixelSize: 14
-                            color: "#0aedb2"
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                        }
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-
-                        onClicked: {
-                            downloadPrompt.isVisible = true
+                IconButton{
+                    id: trackModeBtn
+                    btnWidth: parent.width
+                    btnHeight: 40
+                    iconSource: "qrc:/Resources/Marker.svg"
+                    buttonName:  qsTr("Track Phone")
+                    onBtnClicked: function()
+                    {
+                        if(appBackend.isTracking)
+                        {
+                            appBackend.isTracking = false
+                            drawer.close()
+                        }else{
+                            appBackend.isTracking = true
                             drawer.close()
                         }
-
-                        onEntered:  downloadSection.color = "#1F2937"   // subtle hover
-                        onExited:  downloadSection.color = "transparent"
-
-                        onPressed:  downloadSection.color = "#111827"
-                        onReleased: downloadSection.color = containsMouse ? "#1F2937" : "transparent"
-
-                        cursorShape: Qt.PointingHandCursor
                     }
                 }
 
+                IconButton{
+                    id: downloadModeBtn
+                    btnWidth: parent.width
+                    btnHeight: 40
+                    iconSource: "qrc:/Resources/donwload.svg"
+                    buttonName:  qsTr("Download Maps")
+                    onBtnClicked: function(){
+                        downloadPrompt.isVisible = true
+                        drawer.close()
+                    }
+                }
 
                 //offline maps
                 Rectangle {
@@ -492,99 +343,20 @@ ApplicationWindow {
                 }
 
                 //Settings
-                Rectangle {
-                    id: settingSection
-                    width: parent.width
-                    height: 48
-                    radius: 12
-                    color: "transparent"
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 16
-                        anchors.rightMargin: 16
-                        spacing: 12
-                        Item {
-                            width: 24
-                            height: 24
-                            IconImage {
-                                anchors.centerIn: parent
-                                source: "qrc:/Resources/Settings.svg"
-                                sourceSize.width: 20
-                                sourceSize.height: 20
-                                fillMode: Image.PreserveAspectFit
-                                color: "#9CA3AF"
-                            }
-                        }
-                        Text {
-                            text: qsTr("Settings")
-                            font.pixelSize: 14
-                            color: "#E5E7EB"
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                        }
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-
-                        onEntered: settingSection.color = "#1F2937"   // subtle hover
-                        onExited: settingSection.color = "transparent"
-
-                        onPressed: settingSection.color = "#111827"
-                        onReleased: settingSection.color = containsMouse ? "#1F2937" : "transparent"
-
-                        cursorShape: Qt.PointingHandCursor
-                    }
+                IconButton{
+                    id: settingsId
+                    btnHeight: 40
+                    btnWidth: parent.width
+                    iconSource: "qrc:/Resources/Settings.svg"
+                    buttonName: qsTr("Settings")
                 }
-
                 //Help and Support
-                Rectangle {
-                    id: helpAndSupportSection
-                    width: parent.width
-                    height: 48
-                    radius: 12
-                    color: "transparent"
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 16
-                        anchors.rightMargin: 16
-                        spacing: 12
-                        Item {
-                            width: 24
-                            height: 24
-                            IconImage {
-                                anchors.centerIn: parent
-                                source: "qrc:/Resources/Help.svg"
-                                sourceSize.width: 20
-                                sourceSize.height: 20
-                                fillMode: Image.PreserveAspectFit
-                                color: "#9CA3AF"
-                            }
-                        }
-                        Text {
-                            text: qsTr("Help and Support")
-                            font.pixelSize: 14
-                            color: "#E5E7EB"
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                        }
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-
-                        onEntered: helpAndSupportSection.color = "#1F2937"   // subtle hover
-                        onExited: helpAndSupportSection.color = "transparent"
-
-                        onPressed: helpAndSupportSection.color = "#111827"
-                        onReleased: helpAndSupportSection.color = containsMouse ? "#1F2937" : "transparent"
-
-                        cursorShape: Qt.PointingHandCursor
-                    }
+                IconButton{
+                    id: helpAndSupportId
+                    btnHeight: 40
+                    btnWidth: parent.width
+                    iconSource: "qrc:/Resources/Help.svg"
+                    buttonName: qsTr("Help & Support ")
                 }
 
                 Item { Layout.fillHeight: true }
