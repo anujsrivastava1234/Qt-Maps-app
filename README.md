@@ -33,7 +33,7 @@ This app focuses on smooth UI, offline capabilities, and flexible map visualizat
 
 ---
 
-## 📸 Screenshots
+## 📸 Demo
 
 > [![Mapify Demo](https://github.com/user-attachments/assets/2e6227fd-e5f0-4e23-bff8-bcd40c2521a7)](https://youtu.be/UDFdp8JLu-M)
 
