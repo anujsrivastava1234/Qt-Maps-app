@@ -1,3 +1,4 @@
+import QtCore
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -10,6 +11,32 @@ ApplicationWindow {
     visible: true
     width: 320
     height: 640
+
+    LocationPermission{
+         id: locationPermission
+
+    }
+
+    Rectangle {
+        id: permissionRequestItem
+        anchors.fill: parent
+        visible: false
+
+        Text {
+            anchors.centerIn: parent
+            text: qsTr("We need your permission to access the Location."
+                + "Please tap this screen to request permission.")
+
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: locationPermission.request()
+        }
+    }
+
+
+
     header: Rectangle {
         color:  "#1d1d20"
         height: 56
