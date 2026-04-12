@@ -100,7 +100,7 @@ ApplicationWindow {
                 blurOverlay.visible = false
                 effectSource.visible = false
             }
-            Rectangle{
+            background:Rectangle{
                 anchors.fill: parent
                 color: "#1d1d20"
             }
@@ -455,6 +455,7 @@ ApplicationWindow {
                             sateliteBtnId.isSelected = false
                             terrainBtnId.isSelected = false
                             standardBtnId.isSelected = true
+                            drawer.close()
                         }
                     }
                     MapButton{
@@ -469,6 +470,7 @@ ApplicationWindow {
                             standardBtnId.isSelected = false
                             terrainBtnId.isSelected = false
                             sateliteBtnId.isSelected = true
+                            drawer.close()
                         }
                     }
                     MapButton{
@@ -483,6 +485,7 @@ ApplicationWindow {
                             standardBtnId.isSelected = false
                             sateliteBtnId.isSelected = false
                             terrainBtnId.isSelected = true
+                            drawer.close()
                         }
                     }
                 }

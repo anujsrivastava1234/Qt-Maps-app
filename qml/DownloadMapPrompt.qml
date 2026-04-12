@@ -64,7 +64,7 @@ Item {
             Text {
                 text: qsTr("Do you want to download this map for offline use ?")
                 color: "#575b66"
-                font.pointSize: 8
+                font.pointSize: 13
                 horizontalAlignment: Text.AlignHCenter
             }
 
@@ -161,7 +161,7 @@ Item {
             Text {
                 text: qsTr("Preparing offline access...")
                 color: "#575b66"
-                font.pointSize: 10
+                font.pointSize: 12
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
@@ -227,7 +227,7 @@ Item {
             Text {
                 text: qsTr("Map is ready for the offline use.")
                 color: "#575b66"
-                font.pointSize: 10
+                font.pointSize: 12
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
