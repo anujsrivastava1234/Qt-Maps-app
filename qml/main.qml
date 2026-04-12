@@ -512,7 +512,6 @@ ApplicationWindow {
                     anchors.right: parent.right
                     anchors.leftMargin: 7
                     anchors.rightMargin: 7
-                    anchors.bottomMargin: 10
 
                     property bool hovered: false
                     property bool pressed: false
