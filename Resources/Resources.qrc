@@ -10,5 +10,11 @@
         <file>profile.svg</file>
         <file>saved.svg</file>
         <file>Settings.svg</file>
+        <file>close.svg</file>
+        <file>down.svg</file>
+        <file>right.svg</file>
+        <file>satellite.svg</file>
+        <file>standard.svg</file>
+        <file>terrain.svg</file>
     </qresource>
 </RCC>

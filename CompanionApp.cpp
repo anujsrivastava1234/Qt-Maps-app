@@ -68,7 +68,7 @@ void CompanionApp::createOfflineAreaFromExtend()
 
 CompanionApp::CompanionApp(QObject *parent /* = nullptr */)
     : QObject(parent)
-    , m_map(new Map(BasemapStyle::OsmNavigation, this))
+    , m_map(new Map(BasemapStyle::ArcGISNavigation, this))
 {}
 
 CompanionApp::~CompanionApp() = default;
@@ -178,11 +178,7 @@ void CompanionApp::setNightModeEnabled(bool newNightModeEnabled)
     if (m_nightModeEnabled == newNightModeEnabled)
         return;
     m_nightModeEnabled = newNightModeEnabled;
-    if (newNightModeEnabled)
-        m_map->setBasemap(new Basemap(BasemapStyle::OsmNavigationDark));
-    else
-        m_map->setBasemap(new Basemap(BasemapStyle::OsmNavigation));
-
+    setMapType(m_mapType);
     emit nightModeEnabledChanged();
 }
 
@@ -221,4 +217,57 @@ void CompanionApp::setOfflineModeEnabled(bool newOfflineModeEnabled)
         }
     }
     emit offlineModeEnabledChanged();
+}
+
+int CompanionApp::mapType() const
+{
+    return m_mapType;
+}
+
+void CompanionApp::setMapType(int newMapType)
+{
+    if (m_mapType == newMapType)
+        return;
+
+    m_mapType = newMapType;
+    BasemapStyle style;
+    if (m_nightModeEnabled)
+    {
+
+        switch (m_mapType)
+        {
+        case 0:
+            style = BasemapStyle::ArcGISNavigationNight;
+            break;
+
+        case 1:
+            style = BasemapStyle::ArcGISImageryStandard;
+            break;
+
+        case 2:
+            style = BasemapStyle::ArcGISTerrainDetail;
+            break;
+        }
+    }
+    else
+    {
+        switch (m_mapType)
+        {
+        case 0:
+            style = BasemapStyle::ArcGISNavigation;
+            break;
+
+        case 1:
+            style = BasemapStyle::ArcGISImageryStandard;
+            break;
+
+        case 2:
+            style = BasemapStyle::ArcGISTerrain;
+            break;
+        }
+    }
+
+    m_map->setBasemap(new Basemap(style, this));
+
+    emit mapTypeChanged();
 }

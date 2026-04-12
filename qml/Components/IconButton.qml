@@ -7,6 +7,7 @@ Item {
     id: root
     property string iconSource: ""
     property string buttonName: ""
+    property string actionIcon: ""
     property int btnWidth: 0
     property int btnHeight: 0
     anchors.leftMargin: 2
@@ -49,6 +50,19 @@ Item {
             Item {
                 Layout.fillWidth: true
             }
+            Item {
+                width: 15
+                height: 15
+                IconImage {
+                    id: actionIconId
+                    anchors.centerIn: parent
+                    source: root.actionIcon
+                    sourceSize.width: 15
+                    sourceSize.height: 15
+                    fillMode: Image.PreserveAspectFit
+                    color: "#9CA3AF"
+                }
+            }
         }
         MouseArea {
             anchors.fill: parent
@@ -71,8 +85,14 @@ Item {
                 iconId.color = "#9CA3AF"
                 textId.color = "#E5E7EB"
                 textId.font.pixelSize = 14
+                drawerBtn.border.width = 0
             }
-            onPressed: drawerBtn.color = "#111827"
+            onPressed: {
+                iconId.color = "#0affe6"
+                textId.color = "#0affe6"
+                drawerBtn.border.width = 0.5
+                drawerBtn.border.color = "#0affe6"
+            }
             onReleased: drawerBtn.color = containsMouse ? "#1F2937" : "transparent"
 
             cursorShape: Qt.PointingHandCursor

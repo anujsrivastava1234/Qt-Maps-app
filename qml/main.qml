@@ -1,11 +1,13 @@
 import QtCore
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import QtQuick.Controls
-import QtQuick.Controls.impl
 import Esri.CompanionApp
+import QtQuick.Controls.impl
 import Qt5Compat.GraphicalEffects
 import "Components"
+
 ApplicationWindow {
     id: windowId
     visible: true
@@ -13,29 +15,23 @@ ApplicationWindow {
     height: 640
 
     LocationPermission{
-         id: locationPermission
-
+        id: locationPermission
     }
 
     Rectangle {
         id: permissionRequestItem
         anchors.fill: parent
         visible: false
-
         Text {
             anchors.centerIn: parent
             text: qsTr("We need your permission to access the Location."
-                + "Please tap this screen to request permission.")
-
+                       + "Please tap this screen to request permission.")
         }
-
         MouseArea {
             anchors.fill: parent
             onClicked: locationPermission.request()
         }
     }
-
-
 
     header: Rectangle {
         color:  "#1d1d20"
@@ -90,34 +86,125 @@ ApplicationWindow {
             id: appBackend
         }
 
-
         Rectangle{
             id: containerId
             anchors.fill: parent
             z: 1000
             color: "transparent"
         }
-
         Drawer {
             id: drawer
-            width: windowId.width * 0.75
+            width: windowId.width * 0.85
             height: windowId.height
             onClosed: {
                 blurOverlay.visible = false
                 effectSource.visible = false
             }
-
             Rectangle{
                 anchors.fill: parent
                 color: "#1d1d20"
             }
             ColumnLayout {
                 anchors.fill: parent
-                anchors.left: parent.Left
-                anchors.right: parent.Right
-                anchors.leftMargin: 2
-                anchors.rightMargin: 2
+                anchors.margins: 5
+                //Profile layout
+                RowLayout{
+                    Layout.fillWidth: true
+                    Layout.margins: 10
 
+                    Rectangle{
+                        id: profileIconRectId
+                        width: 40
+                        height: 40
+                        radius: 20
+                        color: "#26262b"
+                        IconImage {
+                            id: profileIcon
+                            sourceSize.height: parent.height * 0.4
+                            sourceSize.width: parent.width * 0.4
+                            fillMode: Image.PreserveAspectFit
+                            anchors.centerIn: parent
+                            color: "#0affe6"
+                            source: "qrc:/Resources/profile.svg"
+                        }
+                    }
+                    MultiEffect {
+                        source: profileIconRectId
+                        anchors.fill: profileIconRectId
+                        shadowBlur: 0.5
+                        shadowEnabled: true
+                        shadowColor: "#0affe6"
+                        shadowVerticalOffset: 0.5
+                        shadowHorizontalOffset: 0.5
+                    }
+                    ColumnLayout{
+                        id: profileSectionId
+                        anchors.left: profileIconRectId.right
+                        anchors.leftMargin: 8
+                        spacing: 0.1
+                        Text {
+                            id: nameId
+                            text: qsTr("Alex Rivera")
+                            font.bold: true
+                            font.pointSize: 14
+                            color: "#e6e9ee"
+                        }
+                        Text {
+                            id: emailId
+                            text: qsTr("alex@gmail.com")
+                            color: "#727885"
+                        }
+                    }
+                    Rectangle{
+                        width: 24
+                        height: 24
+                        anchors.left: profileSectionId.right
+                        anchors.leftMargin: 60
+                        Layout.alignment: Qt.AlignRight
+                        color: "transparent"
+                        IconImage{
+                            sourceSize.width: parent.width
+                            sourceSize.height: parent.height
+                            source: "qrc:/Resources/close.svg"
+                            fillMode: Image.PreserveAspectFit
+                            color: "#9CA3AF"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: function(){
+                                drawer.close()
+                            }
+                        }
+                    }
+                }
+
+                RowLayout{
+                    Layout.fillWidth: true
+                    Layout.margins: 5
+                    spacing: 5
+                    StatsSection{
+                        statsNumber: 24
+                        statsName: "Saved"
+                        statsHeight: 50
+                        statsWidth: 80
+                    }
+                    StatsSection{
+                        statsNumber: 8
+                        statsName: "Routes"
+                        statsHeight: 50
+                        statsWidth: 80
+                    }
+                    StatsSection{
+                        statsNumber: 3
+                        statsName: "Offline"
+                        statsHeight: 50
+                        statsWidth: 80
+                    }
+                }
+
+                //divider
+                Divider{}
+                //Profile Btn
                 IconButton{
                     id: profileBtn
                     btnWidth: parent.width
@@ -128,7 +215,7 @@ ApplicationWindow {
                         console.log("Profile Button is clicked")
                     }
                 }
-
+                //saved places
                 IconButton{
                     id: savedBtn
                     btnWidth: parent.width
@@ -139,7 +226,7 @@ ApplicationWindow {
                         console.log("Saved Place Btn is clicked")
                     }
                 }
-
+                //track mode
                 IconButton{
                     id: trackModeBtn
                     btnWidth: parent.width
@@ -158,19 +245,6 @@ ApplicationWindow {
                         }
                     }
                 }
-
-                IconButton{
-                    id: downloadModeBtn
-                    btnWidth: parent.width
-                    btnHeight: 40
-                    iconSource: "qrc:/Resources/donwload.svg"
-                    buttonName:  qsTr("Download Maps")
-                    onBtnClicked: function(){
-                        downloadPrompt.isVisible = true
-                        drawer.close()
-                    }
-                }
-
                 //offline maps
                 Rectangle {
                     id: offlineSection
@@ -254,7 +328,6 @@ ApplicationWindow {
                     }
 
                 }
-
                 //darkMode
                 Rectangle {
                     id: darkModeSection
@@ -341,7 +414,8 @@ ApplicationWindow {
                     }
 
                 }
-
+                //divider
+                Divider{}
                 //Settings
                 IconButton{
                     id: settingsId
@@ -349,7 +423,70 @@ ApplicationWindow {
                     btnWidth: parent.width
                     iconSource: "qrc:/Resources/Settings.svg"
                     buttonName: qsTr("Settings")
+                    actionIcon: "qrc:/Resources/right.svg"
+                    onBtnClicked: function(){
+                        if(mapTypeSection.visible)
+                        {
+                            mapTypeSection.visible = false
+                            settingsId.actionIcon = "qrc:/Resources/right.svg"
+                        }else{
+                            mapTypeSection.visible = true
+                            settingsId.actionIcon = "qrc:/Resources/down.svg"
+                        }
+
+
+
+                    }
                 }
+                RowLayout{
+                    id: mapTypeSection
+                    Layout.fillWidth: true
+                    visible: false
+                    MapButton{
+                        id: standardBtnId
+                        btnName: "Standard"
+                        iconName: "qrc:/Resources/standard.svg"
+                        btnHeight: 50
+                        btnWidth: 80
+                        isSelected: true
+                        onBtnClicked: {
+                            appBackend.mapType = 0
+                            sateliteBtnId.isSelected = false
+                            terrainBtnId.isSelected = false
+                            standardBtnId.isSelected = true
+                        }
+                    }
+                    MapButton{
+                        id: sateliteBtnId
+                        btnName: "Satellite"
+                        iconName: "qrc:/Resources/satellite.svg"
+                        btnHeight: 50
+                        btnWidth: 80
+                        isSelected: false
+                        onBtnClicked: {
+                            appBackend.mapType = 1
+                            standardBtnId.isSelected = false
+                            terrainBtnId.isSelected = false
+                            sateliteBtnId.isSelected = true
+                        }
+                    }
+                    MapButton{
+                        id: terrainBtnId
+                        btnName: "Terrain"
+                        iconName: "qrc:/Resources/terrain.svg"
+                        btnHeight: 50
+                        btnWidth: 80
+                        isSelected: false
+                        onBtnClicked: {
+                            appBackend.mapType = 2
+                            standardBtnId.isSelected = false
+                            sateliteBtnId.isSelected = false
+                            terrainBtnId.isSelected = true
+                        }
+                    }
+                }
+
+
                 //Help and Support
                 IconButton{
                     id: helpAndSupportId
@@ -358,8 +495,74 @@ ApplicationWindow {
                     iconSource: "qrc:/Resources/Help.svg"
                     buttonName: qsTr("Help & Support ")
                 }
-
                 Item { Layout.fillHeight: true }
+                Rectangle {
+                    id: downloadMapButton
+                    width: parent.width
+                    height: 40
+                    radius: 13
+
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: 7
+                    anchors.rightMargin: 7
+                    anchors.bottomMargin: 10
+
+                    property bool hovered: false
+                    property bool pressed: false
+
+                    color: pressed ? "#00cbb5" : hovered ? "#00e0cc" : "#00ffe6"
+                    scale: pressed ? 0.97 : 1.0
+
+                    Behavior on color { ColorAnimation { duration: 120 } }
+                    Behavior on scale { NumberAnimation { duration: 100 } }
+
+                    RowLayout {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        anchors.centerIn: parent
+
+                        Rectangle {
+                            width: 12
+                            height: 12
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: "transparent"
+
+                            IconImage {
+                                color: "#09090b"
+                                sourceSize.width: parent.width
+                                sourceSize.height: parent.height
+                                source: "qrc:/Resources/donwload.svg"
+                                fillMode: Image.PreserveAspectFit
+                            }
+                        }
+
+                        Text {
+                            id: name
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: qsTr("Download New Maps")
+                            font.pointSize: 12
+                            color: "#09090b"
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+
+                            onEntered: downloadMapButton.hovered = true
+                            onExited: downloadMapButton.hovered = false
+
+                            onPressed: downloadMapButton.pressed = true
+                            onReleased: downloadMapButton.pressed = false
+
+                            onClicked: function() {
+                                downloadPrompt.isVisible = true
+                                drawer.close()
+                            }
+                        }
+                    }
+                }
             }
 
         }

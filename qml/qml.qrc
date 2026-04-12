@@ -4,5 +4,8 @@
         <file>CompanionAppForm.qml</file>
         <file>DownloadMapPrompt.qml</file>
         <file>Components/IconButton.qml</file>
+        <file>Components/Divider.qml</file>
+        <file>Components/StatsSection.qml</file>
+        <file>Components/MapButton.qml</file>
     </qresource>
 </RCC>

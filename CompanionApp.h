@@ -30,13 +30,15 @@ class OfflineMapTask;
 Q_MOC_INCLUDE("MapQuickView.h")
 
 enum MapTypes{
-    OpenStreets,
-    OpenStreetsNight
+    STANDARD = 0,
+    SATELLITE,
+    TERRAIN
 };
 
 class CompanionApp : public QObject
 {
     Q_OBJECT
+    Q_ENUM(MapTypes)
 
     Q_PROPERTY(Esri::ArcGISRuntime::MapQuickView *mapView READ mapView WRITE setMapView NOTIFY
                    mapViewChanged)
@@ -44,6 +46,7 @@ class CompanionApp : public QObject
     Q_PROPERTY(int downloadProgress READ downloadProgress WRITE setDownloadProgress NOTIFY downloadProgressChanged FINAL)
     Q_PROPERTY(bool nightModeEnabled READ nightModeEnabled WRITE setNightModeEnabled NOTIFY nightModeEnabledChanged FINAL)
     Q_PROPERTY(bool offlineModeEnabled READ offlineModeEnabled WRITE setOfflineModeEnabled NOTIFY offlineModeEnabledChanged FINAL)
+    Q_PROPERTY(int mapType READ mapType WRITE setMapType NOTIFY mapTypeChanged)
 
 public:
     explicit CompanionApp(QObject *parent = nullptr);
@@ -66,14 +69,16 @@ public:
     bool offlineModeEnabled() const;
     void setOfflineModeEnabled(bool newOfflineModeEnabled);
 
+    int mapType() const;
+    void setMapType(int newMapType);
+
 signals:
     void mapViewChanged();
     void isTrackingChanged();
     void nightModeEnabledChanged();
-
     void downloadProgressChanged();
-
     void offlineModeEnabledChanged();
+    void mapTypeChanged();
 
 private:
     Esri::ArcGISRuntime::MapQuickView *mapView() const;
@@ -81,9 +86,8 @@ private:
     Esri::ArcGISRuntime::Map *m_map = nullptr;
     Esri::ArcGISRuntime::MapQuickView *m_mapView = nullptr;
     Esri::ArcGISRuntime::ExportVectorTilesTask *m_exportTask = nullptr;
-    bool m_isTracking;
+    bool m_isTracking = false;
     void exportVectorTile(Esri::ArcGISRuntime::ArcGISVectorTiledLayer *layer);
-    enum MapTypes mapTypes = OpenStreets;
     bool m_nightModeEnabled = false;
     Esri::ArcGISRuntime::ExportVectorTilesJob *m_exportJob = nullptr;
     Esri::ArcGISRuntime::PortalItem *m_portalItem = nullptr;
@@ -91,6 +95,7 @@ private:
 
     int m_downloadProgress{0};
     bool m_offlineModeEnabled = false;
+    int m_mapType = 0;
 };
 
 #endif // COMPANIONAPP_H
