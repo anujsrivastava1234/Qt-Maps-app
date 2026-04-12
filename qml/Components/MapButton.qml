@@ -25,7 +25,7 @@ Item {
             color: root.isSelected ? "#00e0cc" : "#9CA3AF"
         }
         color: root.isSelected ? "#223334" : "transparent"
-        opacity: 0.5
+        opacity: root.isSelected ? 1.0 : 0.5
 
         ColumnLayout{
             anchors.centerIn: parent

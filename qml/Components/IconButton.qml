@@ -10,6 +10,7 @@ Item {
     property string actionIcon: ""
     property int btnWidth: 0
     property int btnHeight: 0
+    property bool isSelected: false
     anchors.leftMargin: 2
     anchors.rightMargin: 2
     signal btnClicked
@@ -21,7 +22,12 @@ Item {
         width: root.btnWidth
         height: root.btnHeight
         radius: 12
-        color: "transparent"
+        // Base color should prioritize isSelected, then hover, then transparent
+        color: root.isSelected ? "#2f2f33" : "transparent"
+
+        // Optional: Add a subtle border or accent if selected to make it "pop"
+        border.width: root.isSelected ? 1 : 0
+        border.color: "#0affe6"
         RowLayout {
             anchors.fill: parent
             anchors.leftMargin: 16

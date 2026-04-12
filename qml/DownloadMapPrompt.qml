@@ -11,35 +11,6 @@ Item {
     property bool isVisible: false
 
     visible: isVisible   // 👈 move visibility here
-
-    Rectangle {
-            id: blurBackground
-            anchors.fill: parent
-            color: "transparent"
-
-            // This captures whatever is underneath this component
-            ShaderEffectSource {
-                id: effectSource
-                anchors.fill: parent
-                sourceItem: parent.parent // Captures the screen behind the dialog
-                live: true
-                hideSource: false
-            }
-
-            FastBlur {
-                anchors.fill: parent
-                source: effectSource
-                radius: 40
-                cached: true
-            }
-
-            // Dark overlay to make text pop
-            Rectangle {
-                anchors.fill: parent
-                color: "black"
-                opacity: 0.4
-            }
-        }
     Rectangle {
         id: dialogId
         height: parent.height * 0.30
@@ -64,7 +35,7 @@ Item {
             Text {
                 text: qsTr("Do you want to download this map for offline use ?")
                 color: "#575b66"
-                font.pointSize: 8
+                font.pointSize: 13
                 horizontalAlignment: Text.AlignHCenter
             }
 
@@ -111,7 +82,7 @@ Item {
                         implicitWidth: 100
                         implicitHeight: 40
                         color: yesBtn.down ? "#00ffe6" : "#212124"
-                        border.width: yesBtn.down ? 0 : 0.3
+                        border.width: yesBtn.down ? 0 : 1
                         border.color: "#79808e"
                         radius: 30
                     }
@@ -161,7 +132,7 @@ Item {
             Text {
                 text: qsTr("Preparing offline access...")
                 color: "#575b66"
-                font.pointSize: 10
+                font.pointSize: 13
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
@@ -227,7 +198,7 @@ Item {
             Text {
                 text: qsTr("Map is ready for the offline use.")
                 color: "#575b66"
-                font.pointSize: 10
+                font.pointSize: 13
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 

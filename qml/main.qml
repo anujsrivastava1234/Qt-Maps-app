@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Esri.CompanionApp
 import QtQuick.Controls.impl
+import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 import "Components"
 
@@ -34,6 +35,7 @@ ApplicationWindow {
     }
 
     header: Rectangle {
+        id: headerId
         color:  "#1d1d20"
         height: 56
         RowLayout {
@@ -96,6 +98,10 @@ ApplicationWindow {
             id: drawer
             width: windowId.width * 0.75
             height: windowId.height
+            background:Rectangle{
+                anchors.fill: parent
+                color: "#1d1d20"
+            }
             onClosed: {
                 blurOverlay.visible = false
                 effectSource.visible = false
@@ -424,24 +430,22 @@ ApplicationWindow {
                     btnWidth: parent.width
                     iconSource: "qrc:/Resources/Settings.svg"
                     buttonName: qsTr("Settings")
-                    actionIcon: "qrc:/Resources/right.svg"
-                    onBtnClicked: function(){
-                        if(mapTypeSection.visible)
-                        {
-                            mapTypeSection.visible = false
-                            settingsId.actionIcon = "qrc:/Resources/right.svg"
-                        }else{
-                            mapTypeSection.visible = true
-                            settingsId.actionIcon = "qrc:/Resources/down.svg"
-                        }
+                    // Bind actionIcon based on visibility
+                    actionIcon: mapTypeSection.visible ? "qrc:/Resources/down.svg" : "qrc:/Resources/right.svg"
 
+                    // Highlight stays true as long as the section is open
+                    isSelected: mapTypeSection.visible
 
-
+                    onBtnClicked: function() {
+                        // Just toggle the visibility; the properties above will react automatically
+                        mapTypeSection.visible = !mapTypeSection.visible
                     }
                 }
                 RowLayout{
                     id: mapTypeSection
                     Layout.fillWidth: true
+                    anchors.top: settingsId.bottom
+                    anchors.topMargin: 10
                     visible: false
                     MapButton{
                         id: standardBtnId
