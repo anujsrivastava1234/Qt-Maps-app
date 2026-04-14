@@ -32,7 +32,7 @@ elseif(APPLE)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum macOS deployment version" FORCE)
 endif()
 
-find_package(Qt6 COMPONENTS REQUIRED Core Quick Multimedia Positioning Sensors WebSockets)
+find_package(Qt6 COMPONENTS REQUIRED Core Quick Multimedia Positioning Sensors WebSockets WebView)
 if (Qt6Core_VERSION VERSION_LESS 6.8.2)
   message(FATAL_ERROR "This version of the ArcGIS Maps SDK for Qt requires at least Qt 6.8.2")
 endif()
@@ -105,13 +105,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt6::Positioning
   Qt6::Sensors
   Qt6::WebSockets
+  Qt6::WebView
   ArcGISRuntime::Cpp)
 
 # To integrate the toolkit, copy the `toolkitcpp` and the `common` subdirectories from the toolkit
 # into your project's directory. Then uncomment the following lines to add it to your project.
 # See https://github.com/Esri/arcgis-maps-sdk-toolkit-qt for details
-# add_subdirectory(toolkitcpp)
-# target_link_libraries(${PROJECT_NAME} PRIVATE libtoolkitcpp)
+add_subdirectory(toolkitcpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE libtoolkitcpp)
 
 if(ANDROID)
   set(PROJECT_DEPLOYABLE_LIBS
