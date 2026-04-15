@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Esri.CompanionApp
+import QtQuick.Controls.impl
 
 Item {
     id: root
@@ -20,7 +21,6 @@ Item {
             left: parent.left
             right: parent.right
             top: parent.top
-            margins: 20
         }
         z: 10 // Ensure it sits above the MapView
         height: columnLayout.height
@@ -53,7 +53,8 @@ Item {
                         background: null
                         selectByMouse: true
                         font.pixelSize: 16
-                          color: "white"
+                        placeholderTextColor: "white"
+                        selectedTextColor: "white"
                         onTextChanged: {
                             suggestView.visible = (text.length > 0);
                             appBackend.setSuggestions(text);
@@ -67,17 +68,25 @@ Item {
                     }
 
                     // Clear/Close Button
-                    Button {
+                    Rectangle {
                         Layout.preferredWidth: 30
                         Layout.preferredHeight: 30
-                        flat: true
-                        text: "qrc:/Resources/close.svg"
-                        visible: textField.text.length > 0
-                        onClicked: {
-                            textField.text = "";
-                            appBackend.clearGraphics();
-                            textField.focus = true;
+                        color: "transparent"
+                        IconImage{
+                         sourceSize.width: parent.width
+                         sourceSize.height: parent.height
+                         source: "qrc:/Resources/close.svg"
+                         color: "white"
                         }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                textField.text = "";
+                                appBackend.clearGraphics();
+                                textField.focus = true;
+                            }
+                        }
+
                     }
                 }
             }
@@ -101,8 +110,6 @@ Item {
 
                     background: Rectangle {
                         color: highlighted ? "#eee" : "#1b1b1f"
-                        border.color: "#0affe6"
-                        border.width: 1
                     }
 
                     contentItem: Text {
