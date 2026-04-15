@@ -44,11 +44,24 @@
 #include <ExportVectorTilesJob.h>
 #include <Portal.h>
 #include <Envelope.h>
+#include "AttributeListModel.h"
 #include <EnvelopeBuilder.h>
 #include <GenerateOfflineMapParameters.h>
 #include <GenerateOfflineMapJob.h>
 #include <GenerateOfflineMapResult.h>
 #include <OfflineMapTask.h>
+#include "GeocodeResult.h"
+#include "LocatorTask.h"
+#include "SimpleRenderer.h"
+#include "SuggestParameters.h"
+#include "SuggestListModel.h"
+#include "SimpleMarkerSymbol.h"
+#include "TextSymbol.h"
+
+#include <QAbstractListModel>
+#include <QGeoPositionInfoSource>
+#include <QUrl>
+#include <QUuid>
 QString vtpkFileName = "";
 
 using namespace Esri::ArcGISRuntime;
@@ -66,10 +79,40 @@ void CompanionApp::createOfflineAreaFromExtend()
     }
 }
 
+void CompanionApp::geocode(const QString &query)
+{
+    m_locatorTask->geocodeWithParametersAsync(query, m_geocodeParams).then(this, [this](const QList<GeocodeResult>& geocodeResults){
+        if(!geocodeResults.isEmpty() && m_graphicResultLocation)
+            {
+            const GeocodeResult geocodeResult = geocodeResults.at(0);
+            m_graphicResultLocation->setGeometry(geocodeResult.displayLocation());
+            m_graphicResultLocation->attributes()->setAttributesMap(geocodeResult.attributes());
+            constexpr double scale = 8000.0;
+
+            m_mapView->setViewpointCenterAsync(geocodeResult.extent().center(), scale);
+
+            m_graphicResultLocation->setVisible(true);
+            m_textSymbol->setText(geocodeResult.label());
+            m_graphicResultText->setGeometry(geocodeResult.displayLocation());
+            m_graphicResultText->attributes()->setAttributesMap(geocodeResult.attributes());
+            m_graphicResultLocation->setVisible(true);
+        }
+    });
+}
+
+void CompanionApp::clearGraphics()
+{
+    m_graphicResultLocation->setGeometry(Point());
+    m_graphicResultText->setGeometry(Point());
+}
+
 CompanionApp::CompanionApp(QObject *parent /* = nullptr */)
     : QObject(parent)
     , m_map(new Map(BasemapStyle::ArcGISNavigation, this))
-{}
+{
+
+    setupLocatarTask();
+}
 
 CompanionApp::~CompanionApp() = default;
 
@@ -119,6 +162,9 @@ MapQuickView *CompanionApp::mapView() const
 // Set the view (created in QML)
 void CompanionApp::setMapView(MapQuickView *mapView)
 {
+    connect(m_mapView, &MapQuickView::mouseClicked, this, [this](QMouseEvent& pressed){
+        emit hideSuggestionView();
+    });
     if (!mapView || mapView == m_mapView) {
         return;
     }
@@ -131,6 +177,29 @@ void CompanionApp::setMapView(MapQuickView *mapView)
     emit mapViewChanged();
 
     setupTracking();
+
+    //configure marker graphics
+    configureGraphics();
+}
+
+//Task Locator
+void CompanionApp::setupLocatarTask()
+{
+    //Add the server link
+    const QUrl geocode_service("https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer");
+    m_locatorTask = new LocatorTask(geocode_service, this);
+
+    SuggestParameters _suggestParameters;
+    const QStringList categories{"Address", "POI", "Populated Place"};
+    _suggestParameters.setCategories(categories);
+    _suggestParameters.setMaxResults(5);
+    m_locatorTask->suggestions()->setSuggestParameters(_suggestParameters);
+
+    m_geocodeParams.setMinScore(5);
+    m_geocodeParams.setResultAttributeNames(QStringList {"Place_addr", "Match_addr"});
+    m_suggestions = m_locatorTask->suggestions();
+    emit suggestionsChanged();
+
 }
 
 void CompanionApp::exportVectorTile(Esri::ArcGISRuntime::ArcGISVectorTiledLayer *layer)
@@ -166,6 +235,33 @@ void CompanionApp::exportVectorTile(Esri::ArcGISRuntime::ArcGISVectorTiledLayer 
 
         m_exportJob->start();
     });
+}
+
+void CompanionApp::configureGraphics()
+{
+    if(m_graphicResultLocation)
+        return;
+    //Create a graphics overlay and add to the map
+    m_graphicsOverlay = new GraphicsOverlay(this);
+
+    //set a renderer in graphics overlay
+    SimpleRenderer *m_renderer = new SimpleRenderer(this);
+
+    //Create a symbol marker
+    SimpleMarkerSymbol *simpleMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle::Circle, QColor("#01ffe6"), 15.0, this);
+    m_renderer->setSymbol(simpleMarkerSymbol);
+    m_graphicResultLocation = new Graphic(this);
+    m_graphicResultLocation->setSymbol(simpleMarkerSymbol);
+    m_graphicsOverlay->graphics()->append(m_graphicResultLocation);
+
+    // Create a graphic and symbol to display a label next to the result location
+    m_textSymbol = new TextSymbol("", QColor("Red"), 14.0, HorizontalAlignment::Center, VerticalAlignment::Bottom, this);
+    m_graphicResultText = new Graphic(this);
+    m_graphicResultText->setSymbol(m_textSymbol);
+
+    m_graphicsOverlay->graphics()->append(m_graphicResultText);
+
+    m_mapView->graphicsOverlays()->append(m_graphicsOverlay);
 }
 
 bool CompanionApp::nightModeEnabled() const
@@ -259,4 +355,21 @@ void CompanionApp::updateBaseMap()
     }
 
     m_map->setBasemap(new Basemap(style, this));
+}
+QAbstractListModel *CompanionApp::suggestions() const
+{
+    return m_suggestions;
+}
+
+void CompanionApp::setSuggestions(const QString &text)
+{
+    if(!m_suggestions)
+        return;
+
+    SuggestListModel *_suggestListModel = dynamic_cast<SuggestListModel*>(m_suggestions);
+
+    if(!m_suggestions)
+        return;
+
+    _suggestListModel->setSearchText(text);
 }

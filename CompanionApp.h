@@ -16,7 +16,12 @@
 namespace Esri::ArcGISRuntime {
 class Map;
 class MapQuickView;
+class GraphicsOverlay;
 class Graphic;
+class LocatorTask;
+class GeocodeResult;
+class SuggestResult;
+class TextSymbol;
 class PolylineBuilder;
 class ArcGISVectorTiledLayer;
 class ExportVectorTilesTask;
@@ -28,6 +33,9 @@ class OfflineMapTask;
 #include <QObject>
 
 Q_MOC_INCLUDE("MapQuickView.h")
+
+#include <QAbstractListModel>
+#include "GeocodeParameters.h"
 
 enum MapTypes{
     STANDARD = 0,
@@ -47,6 +55,7 @@ class CompanionApp : public QObject
     Q_PROPERTY(bool nightModeEnabled READ nightModeEnabled WRITE setNightModeEnabled NOTIFY nightModeEnabledChanged FINAL)
     Q_PROPERTY(bool offlineModeEnabled READ offlineModeEnabled WRITE setOfflineModeEnabled NOTIFY offlineModeEnabledChanged FINAL)
     Q_PROPERTY(int mapType READ mapType WRITE setMapType NOTIFY mapTypeChanged)
+    Q_PROPERTY(QAbstractListModel* suggestions READ suggestions  NOTIFY suggestionsChanged FINAL)
 
 public:
     explicit CompanionApp(QObject *parent = nullptr);
@@ -55,6 +64,7 @@ public:
     bool isTracking() const;
     void setIsTracking(bool newIsTracking);
     void setupTracking();
+
 
     Esri::ArcGISRuntime::Graphic *m_pathGraphics = nullptr;
     Esri::ArcGISRuntime::PolylineBuilder *m_polyLine = nullptr;
@@ -65,6 +75,9 @@ public:
     void setDownloadProgress(int newDownloadProgress);
 
     Q_INVOKABLE void createOfflineAreaFromExtend();
+    Q_INVOKABLE void geocode(const QString& query);
+    Q_INVOKABLE void clearGraphics();
+    Q_INVOKABLE void setSuggestions(const QString& text);
 
     bool offlineModeEnabled() const;
     void setOfflineModeEnabled(bool newOfflineModeEnabled);
@@ -74,6 +87,9 @@ public:
 
     void updateBaseMap();
 
+    QAbstractListModel *suggestions() const;
+
+
 signals:
     void mapViewChanged();
     void isTrackingChanged();
@@ -81,10 +97,13 @@ signals:
     void downloadProgressChanged();
     void offlineModeEnabledChanged();
     void mapTypeChanged();
+    void hideSuggestionView();
+    void suggestionsChanged();
 
 private:
     Esri::ArcGISRuntime::MapQuickView *mapView() const;
     void setMapView(Esri::ArcGISRuntime::MapQuickView *mapView);
+    void setupLocatarTask();
     Esri::ArcGISRuntime::Map *m_map = nullptr;
     Esri::ArcGISRuntime::MapQuickView *m_mapView = nullptr;
     Esri::ArcGISRuntime::ExportVectorTilesTask *m_exportTask = nullptr;
@@ -98,6 +117,16 @@ private:
     int m_downloadProgress{0};
     bool m_offlineModeEnabled = false;
     int m_mapType = 0;
+
+    //Search bar model
+    void configureGraphics();
+    Esri::ArcGISRuntime::GraphicsOverlay *m_graphicsOverlay = nullptr;
+    Esri::ArcGISRuntime::LocatorTask *m_locatorTask = nullptr;
+    Esri::ArcGISRuntime::Graphic* m_graphicResultLocation = nullptr;
+    Esri::ArcGISRuntime::Graphic* m_graphicResultText = nullptr;
+    Esri::ArcGISRuntime::TextSymbol* m_textSymbol = nullptr;
+    QAbstractListModel *m_suggestions = nullptr;
+    Esri::ArcGISRuntime::GeocodeParameters m_geocodeParams;
 };
 
 #endif // COMPANIONAPP_H

@@ -1,34 +1,131 @@
-// Copyright 2026 ESRI
-//
-// All rights reserved under the copyright laws of the United States
-// and applicable international laws, treaties, and conventions.
-//
-// You may freely redistribute and use this sample code, with or
-// without modification, provided you include the original copyright
-// notice and use restrictions.
-//
-// See the Sample code usage restrictions document for further information.
-//
-
 import QtQuick
 import QtQuick.Controls
-
+import QtQuick.Layouts
 import Esri.CompanionApp
 
 Item {
+    id: root
     property CompanionApp model
 
-    // Create MapQuickView here, and create its Map etc. in C++ code
     MapView {
         id: view
         anchors.fill: parent
-        // set focus to enable keyboard navigation
         focus: true
     }
 
-    // Declare the C++ instance which creates the map etc. and supply the view
+    // Search Overlay Container
+    Item {
+        id: searchContainer
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: parent.top
+            margins: 20
+        }
+        z: 10 // Ensure it sits above the MapView
+        height: columnLayout.height
 
-    Component.onCompleted:{
-        model.mapView = view
+        ColumnLayout {
+            id: columnLayout
+            width: parent.width
+            spacing: 0
+
+            // Search Bar Input
+            Rectangle {
+                Layout.fillWidth: true
+                height: 50
+                color: "#1b1b1f"
+                radius: 4
+                border.color: "#1b1b1f"
+
+                // Shadow effect (optional, simplified)
+                layer.enabled: true
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    spacing: 10
+
+                    TextField {
+                        id: textField
+                        Layout.fillWidth: true
+                        placeholderText: "Search for an address..."
+                        background: null
+                        selectByMouse: true
+                        font.pixelSize: 16
+                          color: "white"
+                        onTextChanged: {
+                            suggestView.visible = (text.length > 0);
+                            appBackend.setSuggestions(text);
+                        }
+
+                        onAccepted: {
+                            suggestView.visible = false;
+                            appBackend.geocode(textField.text);
+                            Qt.inputMethod.hide();
+                        }
+                    }
+
+                    // Clear/Close Button
+                    Button {
+                        Layout.preferredWidth: 30
+                        Layout.preferredHeight: 30
+                        flat: true
+                        text: "qrc:/Resources/close.svg"
+                        visible: textField.text.length > 0
+                        onClicked: {
+                            textField.text = "";
+                            appBackend.clearGraphics();
+                            textField.focus = true;
+                        }
+                    }
+                }
+            }
+
+            // Suggestions List
+            ListView {
+                id: suggestView
+                Layout.fillWidth: true
+                Layout.preferredHeight: Math.min(count * 45, 300) // Caps height at 300px
+                model: appBackend.suggestions
+                visible: false
+                clip: true
+
+                ScrollBar.vertical: ScrollBar {
+                    policy: ScrollBar.AsNeeded
+                }
+
+                delegate: ItemDelegate {
+                    width: suggestView.width
+                    height: 45
+
+                    background: Rectangle {
+                        color: highlighted ? "#eee" : "#1b1b1f"
+                        border.color: "#0affe6"
+                        border.width: 1
+                    }
+
+                    contentItem: Text {
+                        text: label
+                        verticalAlignment: Text.AlignVCenter
+                        leftPadding: 10
+                        elide: Text.ElideRight
+                        font.pixelSize: 14
+                        color: "white"
+                    }
+
+                    onClicked: {
+                        textField.text = label;
+                        suggestView.visible = false;
+                        appBackend.geocode(label);
+                        Qt.inputMethod.hide();
+                    }
+                }
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        model.mapView = view;
     }
 }
