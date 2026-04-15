@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtCore
 import QtQuick
 import QtQuick.Effects
@@ -6,6 +7,7 @@ import QtQuick.Controls
 import Esri.CompanionApp
 import QtQuick.Controls.impl
 import Qt5Compat.GraphicalEffects
+//import Esri.AccessServicesWithOAuth
 import "Components"
 
 ApplicationWindow {
@@ -13,6 +15,7 @@ ApplicationWindow {
     visible: true
     width: 320
     height: 640
+    color: "#1d1d20"
 
     LocationPermission{
         id: locationPermission
@@ -34,8 +37,9 @@ ApplicationWindow {
     }
 
     header: Rectangle {
-        color:  "#1d1d20"
-        height: 56
+        color: "#1d1d20"
+        visible: !stackView.visible
+        height: visible ? 56 : 0
         RowLayout {
             anchors.fill: parent
             anchors.margins: 10
@@ -78,10 +82,38 @@ ApplicationWindow {
     }
 
 
+    StackView {
+        id: stackView
+        anchors.fill: parent
+        z: 100
+        initialItem: authPageComponent
+    }
+
+    SequentialAnimation {
+        id: authFadeOut
+        NumberAnimation {
+            target: stackView
+            property: "opacity"
+            to: 0
+            duration: 500
+            easing.type: Easing.InQuad
+        }
+        PropertyAction { target: stackView; property: "visible"; value: false }
+    }
+
+    Component {
+        id: authPageComponent
+        AuthenticationPage {
+            onAuthComplete: authFadeOut.start()
+        }
+    }
+
     Item {
         id: contentRoot
         anchors.fill: parent
         // Rename ID to appBackend to avoid shadowing the "model" property name
+
+
         CompanionApp {
             id: appBackend
         }

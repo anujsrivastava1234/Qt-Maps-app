@@ -3,6 +3,7 @@
         <file>main.qml</file>
         <file>CompanionAppForm.qml</file>
         <file>DownloadMapPrompt.qml</file>
+        <file>AuthenticationPage.qml</file>
         <file>Components/IconButton.qml</file>
         <file>Components/Divider.qml</file>
         <file>Components/StatsSection.qml</file>

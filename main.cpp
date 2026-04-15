@@ -13,12 +13,16 @@
 #include "CompanionApp.h"
 
 #include "ArcGISRuntimeEnvironment.h"
+#include "Esri/ArcGISRuntime/Toolkit/register.h"
 #include "MapQuickView.h"
+#include "OAuthUserConfigurationManager.h"
 
+#include <Authentication/OAuthUserConfiguration.h>
 #include <QDir>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QPermission>
+#include <QtWebView>
 
 //------------------------------------------------------------------------------
 
@@ -26,6 +30,7 @@ using namespace Esri::ArcGISRuntime;
 
 int main(int argc, char *argv[])
 {
+    QtWebView::initialize();
     QGuiApplication app(argc, argv);
     ArcGISRuntimeEnvironment::setUseLegacyAuthentication(false);
 
@@ -45,15 +50,19 @@ int main(int argc, char *argv[])
     // ArcGIS location services. Go to the tutorial at https://links.esri.com/create-an-api-key.
     // Copy the API Key access token.
 
-    const QString accessToken = QString("AAPTaaSDrINdzmiP_dhbt8D0fTA..TNL1XpV9Jz1IWzuBkJ3FKz9Q2XDQr4dIYyTi_SeTOEpwqAN58GDAx5nR-Gj7fqndYhPvKqm4UJ2STgCHgm7sdUJ6vqDXMIXhIIkkvyrx0V-PLvkZC1DW4g2Be_KEmUiCwgkGI5jzv7O8hPIC-si2Z2WNcnIuylCNYQ3kvLuGTKu7mnie2h3ucExfl3anoLGw1HNyh4KbfSRLZn6FsPsh5c01fQaddUQzFNcKN_b0vBaOTKdkHdmJVmw.AT1_90YVH5Mi");
+    // OAuth user authentication: the user logs in with their ArcGIS account.
+    // Register your app at https://developers.arcgis.com to get a client ID,
+    // then add a redirect URI (e.g. "my-app://auth") in the app's OAuth settings.
+    const QString clientId = QString("GA5XsmQs90YVH5Mi");
+    const QString redirectUri = QString("urn:ietf:wg:oauth:2.0:oob");
 
-    if (accessToken.isEmpty()) {
-        qWarning()
-            << "Use of ArcGIS location services, such as the basemap styles service, requires"
-            << "you to authenticate with an ArcGIS account or set the API Key property.";
-    } else {
-        ArcGISRuntimeEnvironment::setApiKey(accessToken);
-    }
+    auto* oauthConfig = new Authentication::OAuthUserConfiguration(
+        QUrl("https://www.arcgis.com/sharing/rest"),
+        clientId,
+        redirectUri,
+        &app
+    );
+    Toolkit::OAuthUserConfigurationManager::addConfiguration(oauthConfig);
 
     // Production deployment of applications built with ArcGIS Maps SDK requires you to
     // license ArcGIS Maps SDK functionality. For more information see
@@ -69,6 +78,7 @@ int main(int argc, char *argv[])
 
     // Initialize application view
     QQmlApplicationEngine engine;
+     Esri::ArcGISRuntime::Toolkit::registerComponents(engine);
 
     // Add the import Path
     engine.addImportPath(QDir(QCoreApplication::applicationDirPath()).filePath("qml"));
