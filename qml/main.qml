@@ -7,7 +7,6 @@ import QtQuick.Controls
 import Esri.CompanionApp
 import QtQuick.Controls.impl
 import Qt5Compat.GraphicalEffects
-//import Esri.AccessServicesWithOAuth
 import "Screens"
 import "Components"
 
@@ -116,7 +115,6 @@ ApplicationWindow {
     Component{
         id: profileComponent
         Profile{
-
         }
     }
 
@@ -366,7 +364,6 @@ ApplicationWindow {
                                     y: 2
 
                                     x: offlineSwitch.checked ? parent.width - width - 2 : 2
-
                                     color: "white"
 
                                     // ✨ Smooth toggle movement
@@ -470,6 +467,7 @@ ApplicationWindow {
                     }
 
                 }
+
                 //divider
                 Divider{}
                 //Settings
