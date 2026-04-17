@@ -128,6 +128,42 @@ ApplicationWindow {
             id: appBackend
         }
 
+        ColumnLayout {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottomMargin: 32
+            z: 10
+            spacing: 8
+
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                padding: 5
+                width: contentRoot.width
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.Wrap
+                text: appBackend.textString
+                color: "white"
+                visible: appBackend.textString !== ""
+            }
+
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 12
+
+                Button {
+                    text: "Navigate"
+                    enabled: appBackend.navigationEnabled
+                    onClicked: appBackend.startNavigation()
+                }
+
+                Button {
+                    text: "Recenter"
+                    enabled: appBackend.recenterEnabled
+                    onClicked: appBackend.recenterMap()
+                }
+            }
+        }
+
         PortalUserInfo{
             id: userInfo
         }
