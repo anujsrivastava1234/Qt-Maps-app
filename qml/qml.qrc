@@ -8,5 +8,6 @@
         <file>Components/Divider.qml</file>
         <file>Components/StatsSection.qml</file>
         <file>Components/MapButton.qml</file>
+        <file>Screens/Profile.qml</file>
     </qresource>
 </RCC>

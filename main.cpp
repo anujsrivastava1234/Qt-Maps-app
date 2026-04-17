@@ -11,6 +11,7 @@
 //
 
 #include "CompanionApp.h"
+#include "portaluserinfo.h"
 
 #include "ArcGISRuntimeEnvironment.h"
 #include "Esri/ArcGISRuntime/Toolkit/register.h"
@@ -75,6 +76,9 @@ int main(int argc, char *argv[])
 
     // Register the CompanionApp (QQuickItem) for QML
     qmlRegisterType<CompanionApp>("Esri.CompanionApp", 1, 0, "CompanionApp");
+
+    //Register the Portal class
+    qmlRegisterType<PortalUserInfo>("Esri.CompanionApp", 1, 0, "PortalUserInfo");
 
     // Initialize application view
     QQmlApplicationEngine engine;

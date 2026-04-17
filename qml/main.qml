@@ -8,6 +8,7 @@ import Esri.CompanionApp
 import QtQuick.Controls.impl
 import Qt5Compat.GraphicalEffects
 //import Esri.AccessServicesWithOAuth
+import "Screens"
 import "Components"
 
 ApplicationWindow {
@@ -81,7 +82,6 @@ ApplicationWindow {
         isVisible: false
     }
 
-
     StackView {
         id: stackView
         anchors.fill: parent
@@ -99,12 +99,24 @@ ApplicationWindow {
             easing.type: Easing.InQuad
         }
         PropertyAction { target: stackView; property: "visible"; value: false }
+
+
     }
 
+    //Pages
+    //1. AuthenticationPage
     Component {
         id: authPageComponent
         AuthenticationPage {
             onAuthComplete: authFadeOut.start()
+        }
+    }
+
+    //2.ProfilePage
+    Component{
+        id: profileComponent
+        Profile{
+
         }
     }
 
@@ -118,6 +130,9 @@ ApplicationWindow {
             id: appBackend
         }
 
+        PortalUserInfo{
+            id: userInfo
+        }
 
         Rectangle{
             id: containerId
@@ -178,15 +193,17 @@ ApplicationWindow {
                         spacing: 0.1
                         Text {
                             id: nameId
-                            text: qsTr("Alex Rivera")
+                            text: userInfo.fullName
                             font.bold: true
                             font.pointSize: 14
                             color: "#e6e9ee"
                         }
                         Text {
                             id: emailId
-                            text: qsTr("alex@gmail.com")
+                            text: userInfo.email
                             color: "#727885"
+                            clip: true
+
                         }
                     }
                     Rectangle{
@@ -246,7 +263,12 @@ ApplicationWindow {
                     iconSource: "qrc:/Resources/profile.svg"
                     buttonName: qsTr("Profile")
                     onBtnClicked: function(){
+                        stackView.opacity = 1
+                                stackView.visible = true
                         console.log("Profile Button is clicked")
+                        stackView.z = 2000; // Bring stack to front over the map
+                        stackView.push(profileComponent)
+                        drawer.close() // Close drawer so user sees the page
                     }
                 }
                 //saved places

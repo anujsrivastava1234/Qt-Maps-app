@@ -42,6 +42,8 @@ set(SOURCE_FILES
   main.cpp
   CompanionApp.cpp
   CompanionApp.h
+  portaluserinfo.h
+  portaluserinfo.cpp
   qml/qml.qrc
   Resources/Resources.qrc
   $<$<BOOL:${WIN32}>:Win/Resources.rc>
@@ -51,7 +53,8 @@ set(SOURCE_FILES
 if(ANDROID)
   qt_add_executable(${PROJECT_NAME} ${SOURCE_FILES}  MANUAL_FINALIZATION)
 else()
-  qt_add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCE_FILES})
+  qt_add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCE_FILES}
+    )
   # IOS uses static Runtimecore Framework
   if(IOS)
     # Workaround for the CMake version of https://bugreports.qt.io/browse/QTBUG-129651
