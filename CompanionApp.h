@@ -73,6 +73,7 @@ class CompanionApp : public QObject
     Q_PROPERTY(bool navigationEnabled READ navigationEnabled WRITE setNavigationEnabled NOTIFY navigationEnabledChanged FINAL)
     Q_PROPERTY(bool recenterEnabled READ recenterEnabled WRITE setRecenterEnabled NOTIFY recenterEnabledChanged FINAL)
     Q_PROPERTY(QString textString READ textString WRITE setTextString NOTIFY textStringChanged FINAL)
+    Q_PROPERTY(bool simulationMode READ simulationMode WRITE setSimulationMode NOTIFY simulationModeChanged FINAL)
 
 public:
     explicit CompanionApp(QObject *parent = nullptr);
@@ -98,6 +99,7 @@ public:
 
     Q_INVOKABLE void startNavigation();
     Q_INVOKABLE void recenterMap();
+    Q_INVOKABLE void startSimulation();
 
     bool offlineModeEnabled() const;
     void setOfflineModeEnabled(bool newOfflineModeEnabled);
@@ -121,6 +123,9 @@ public:
     void initializeRoute();
     void connectRouteTrackerSignals();
 
+    bool simulationMode() const;
+    void setSimulationMode(bool newSimulationMode);
+
 signals:
     void mapViewChanged();
     void isTrackingChanged();
@@ -133,6 +138,8 @@ signals:
     void navigationEnabledChanged();
     void recenterEnabledChanged();
     void textStringChanged();
+
+    void simulationModeChanged();
 
 private:
     Esri::ArcGISRuntime::MapQuickView *mapView() const;
@@ -178,6 +185,7 @@ private:
     bool m_navigationEnabled = false;
     bool m_recenterEnabled = true;
     QString m_textString = "";
+    bool m_simulationMode = false;
 };
 
 #endif // COMPANIONAPP_H

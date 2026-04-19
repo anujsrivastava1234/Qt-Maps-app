@@ -142,8 +142,8 @@ ApplicationWindow {
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.Wrap
                 text: appBackend.textString
-                color: "white"
-                visible: appBackend.textString !== ""
+                color: "red"
+                //visible: appBackend.textString !== ""
             }
 
             RowLayout {
@@ -160,6 +160,12 @@ ApplicationWindow {
                     text: "Recenter"
                     enabled: appBackend.recenterEnabled
                     onClicked: appBackend.recenterMap()
+                }
+
+                Button{
+                    text: "Simulation Mode"
+                    enabled: appBackend.navigationEnabled
+                    onClicked: appBackend.startSimulation()
                 }
             }
         }

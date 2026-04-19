@@ -162,13 +162,15 @@ CompanionApp::CompanionApp(QObject *parent /* = nullptr */)
 {
 
     setupLocatarTask();
-
     m_routeOverlay = new GraphicsOverlay(this);
-
     //setup route task using online routing service
     const QUrl routeServiceUrl("https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World");
     m_routeTask = new RouteTask(routeServiceUrl, this);
+#ifdef Q_OS_ANDROID
+    m_speaker = new QTextToSpeech("android", this);
+#else
     m_speaker = new QTextToSpeech(this);
+#endif
 }
 
 CompanionApp::~CompanionApp() = default;
@@ -219,19 +221,19 @@ MapQuickView *CompanionApp::mapView() const
 // Set the view (created in QML)
 void CompanionApp::setMapView(MapQuickView *mapView)
 {
-    connect(m_mapView, &MapQuickView::mouseClicked, this, [this](QMouseEvent& pressed){
-        emit hideSuggestionView();
-    });
     if (!mapView || mapView == m_mapView) {
         return;
     }
-
     m_mapView = mapView;
+
+    connect(m_mapView, &MapQuickView::mouseClicked, this, [this](QMouseEvent&){
+        emit hideSuggestionView();
+    });
     m_mapView->setMap(m_map);
     m_mapView->locationDisplay()->start();
     m_mapView->locationDisplay()->setAutoPanMode(LocationDisplayAutoPanMode::Recenter);
     m_mapView->setRotationByPinchingEnabled(true);
-    //emit mapViewChanged();
+    // emit mapViewChanged();
 
     setupTracking();
 
@@ -245,25 +247,20 @@ void CompanionApp::setMapView(MapQuickView *mapView)
         connect(m_routeTask, &RouteTask::doneLoading, this, [this](const Error& error){
             if(error.isEmpty()){
                 initializeRoute();
-            }        else{
+            } else{
                 qDebug() << error.message() << " " << error.additionalMessage();
             }
         });
 
-        //load the route
         m_routeTask->load();
-        //stops graphics
         SimpleMarkerSymbol *stopSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle::Circle, Qt::red, 20, this);
         m_routeOverlay->graphics()->append(new Graphic(conventionCenterPoint, stopSymbol, this));
         m_routeOverlay->graphics()->append(new Graphic(aerospaceMuseumPoint, stopSymbol, this));
+        emit mapViewChanged();
     }else{
         qWarning() << "RouteTask is null; skipping signal connections.";
     }
 
-
-
-
-    emit mapViewChanged();
 }
 
 //Task Locator
@@ -468,30 +465,27 @@ void CompanionApp::startNavigation()
     connectRouteTrackerSignals();
 
     m_routeTracker->setSpeechEngineReadyFunction([speaker = m_speaker]()-> bool
-    {
-        return speaker->state() == QTextToSpeech::State::Ready;
-
-    });
+                                                 {
+                                                     return speaker->state() != QTextToSpeech::State::Error;
+                                                 });
 
     //enable the recenter button
-    connect(m_mapView->locationDisplay(), &LocationDisplay::locationChanged, this, [this](const Location& location)
+    connect(m_mapView->locationDisplay(), &LocationDisplay::autoPanModeChanged, this, [this](LocationDisplayAutoPanMode autoPanMode)
             {
-        Q_UNUSED(location);
-
-        auto mode = m_mapView->locationDisplay()->autoPanMode();
-
-        m_recenterEnabled = mode != LocationDisplayAutoPanMode::Navigation;
-        emit recenterEnabledChanged();
-    });
+                m_recenterEnabled = autoPanMode != LocationDisplayAutoPanMode::Navigation;
+                emit recenterEnabledChanged();
+            });
 
     connect(m_mapView->locationDisplay(), &LocationDisplay::locationChanged, this, [this](const Location& location)
             {
-        auto future = m_routeTracker->trackLocationAsync(location);
-        Q_UNUSED(future);
-    });
+                auto future = m_routeTracker->trackLocationAsync(location);
+                Q_UNUSED(future);
+            });
 
     //turn the map
     m_mapView->locationDisplay()->setAutoPanMode(LocationDisplayAutoPanMode::Navigation);
+    RouteTrackerLocationDataSource *dataSource = new RouteTrackerLocationDataSource(m_routeTracker, this);
+    m_mapView->locationDisplay()->setDataSource(dataSource);
 
     ReroutingParameters *rerouteParameters = new ReroutingParameters(m_routeTask, m_routeparamters, this);
     rerouteParameters->setStrategy(ReroutingStrategy::ToNextWaypoint);
@@ -517,6 +511,17 @@ void CompanionApp::startNavigation()
 void CompanionApp::recenterMap()
 {
     m_mapView->locationDisplay()->setAutoPanMode(LocationDisplayAutoPanMode::Navigation);
+}
+
+void CompanionApp::startSimulation()
+{
+    m_simulationMode = true;
+    emit simulationModeChanged();
+
+    if (m_routeResult.routes().size() > 0)
+    {
+        startNavigation();
+    }
 }
 
 
@@ -562,46 +567,50 @@ void CompanionApp::setTextString(const QString &newTextString)
 void CompanionApp::initializeRoute()
 {
     m_routeTask->createDefaultParametersAsync().then(
-        this, [this](RouteParameters defaultParameters){
-            //set values for parameters
-            defaultParameters.setReturnRoutes(true);
-            defaultParameters.setReturnDirections(true);
-            defaultParameters.setReturnRoutes(true);
-            defaultParameters.setOutputSpatialReference(SpatialReference::wgs84());
+                                                   this, [this](RouteParameters defaultParameters){
+                                                       //set values for parameters
+                                                       defaultParameters.setReturnRoutes(true);
+                                                       defaultParameters.setReturnDirections(true);
+                                                       defaultParameters.setReturnRoutes(true);
+                                                       defaultParameters.setOutputSpatialReference(SpatialReference::wgs84());
 
-            Stop stop1(conventionCenterPoint);
-            Stop stop2(aerospaceMuseumPoint);
+                                                       Stop stop1(conventionCenterPoint);
+                                                       Stop stop2(aerospaceMuseumPoint);
 
-            QList<Stop> stopList = {stop1, stop2};
-            defaultParameters.setStops(stopList);
+                                                       QList<Stop> stopList = {stop1, stop2};
+                                                       defaultParameters.setStops(stopList);
 
-            m_routeparamters = defaultParameters;
+                                                       m_routeparamters = defaultParameters;
 
-            m_routeTask->solveRouteAsync(defaultParameters)
-                .then(this, [this](const RouteResult& routeResult)
-                      {
-                    if(routeResult.isEmpty() || routeResult.routes().empty())
-                        return;
+                                                       m_routeTask->solveRouteAsync(defaultParameters)
+                                                           .then(this, [this](const RouteResult& routeResult)
+                                                                 {
+                                                                     if(routeResult.isEmpty() || routeResult.routes().empty())
+                                                                         return;
 
-                    m_routeResult = routeResult;
-                    m_route = std::as_const(m_routeResult).routes()[0];
+                                                                     m_routeResult = routeResult;
+                                                                     m_route = std::as_const(m_routeResult).routes()[0];
 
-                    m_directionManeuvers = m_route.directionManeuvers(this)->directionManeuvers();
+                                                                     m_directionManeuvers = m_route.directionManeuvers(this)->directionManeuvers();
 
-                    //adjust viewport to enclose the route
-                    m_mapView->setViewpointGeometryAsync(m_route.routeGeometry(), 100);
+                                                                     //adjust viewport to enclose the route
+                                                                     m_mapView->setViewpointGeometryAsync(m_route.routeGeometry(), 100);
 
-                    m_routeAheadGrapghics = new Graphic(m_route.routeGeometry(), new SimpleLineSymbol(SimpleLineSymbolStyle::Solid, Qt::cyan, 10, this), this);
-                    m_routeTravelledGraphics = new Graphic(Geometry(), new SimpleLineSymbol(SimpleLineSymbolStyle::Solid, Qt::cyan, 10, this), this);
-                    m_routeOverlay->graphics()->append(m_routeAheadGrapghics);
-                    m_routeOverlay->graphics()->append(m_routeTravelledGraphics);
+                                                                     m_routeAheadGrapghics = new Graphic(m_route.routeGeometry(), new SimpleLineSymbol(SimpleLineSymbolStyle::Solid, Qt::cyan, 10, this), this);
+                                                                     m_routeTravelledGraphics = new Graphic(Geometry(), new SimpleLineSymbol(SimpleLineSymbolStyle::Solid, Qt::cyan, 10, this), this);
+                                                                     m_routeOverlay->graphics()->append(m_routeAheadGrapghics);
+                                                                     m_routeOverlay->graphics()->append(m_routeTravelledGraphics);
 
-                    m_navigationEnabled = true;
-                    emit navigationEnabledChanged();
-                }).onFailed(this, [](const ErrorException& e){
-                    qWarning() << "Solve route failed" << e.error().message() << e.error().additionalMessage();
+                                                                     m_navigationEnabled = true;
+                                                                     emit navigationEnabledChanged();
+                                                                     if (m_simulationMode)
+                                                                     {
+                                                                         startNavigation();
+                                                                     }
+                                                                 }).onFailed(this, [](const ErrorException& e){
+                                                               qWarning() << "Solve route failed" << e.error().message() << e.error().additionalMessage();
 
-                });
+                                                           });
                                                    }).onFailed(this, [](const ErrorException& e){
             qWarning() << "Create default parameters failed" << e.error().message() << "" << e.error().additionalInformation();
         });
@@ -609,6 +618,7 @@ void CompanionApp::initializeRoute()
 
 void CompanionApp::connectRouteTrackerSignals()
 {
+    qInfo() << "Connect Route tracker signals";
     connect(m_routeTracker, &RouteTracker::newVoiceGuidance, this, [this](VoiceGuidance* rawVoiceGuidance)
             {
                 auto voiceGuidance = std::unique_ptr<VoiceGuidance>(rawVoiceGuidance);
@@ -627,7 +637,7 @@ void CompanionApp::connectRouteTrackerSignals()
                                       trackingStatus->routeProgress()->remainingDistance()->displayTextUnits().pluralDisplayName() + "\n";
                         QTime time = QTime::fromMSecsSinceStartOfDay(trackingStatus->routeProgress()->remainingTime() * 60 * 1000); // convert time to milliseconds
                         textString += "Time remaining: " + time.toString("hh:mm:ss") + "\n";
-
+                        qInfo() << textString;
                         // display next direction
                         if (m_directionManeuvers.size() > 0)
                         {
@@ -682,4 +692,17 @@ void CompanionApp::connectRouteTrackerSignals()
                 m_routeOverlay->graphics()->append(m_routeAheadGrapghics);
                 m_routeOverlay->graphics()->append(m_routeTravelledGraphics);
             });
+}
+
+bool CompanionApp::simulationMode() const
+{
+    return m_simulationMode;
+}
+
+void CompanionApp::setSimulationMode(bool newSimulationMode)
+{
+    if (m_simulationMode == newSimulationMode)
+        return;
+    m_simulationMode = newSimulationMode;
+    emit simulationModeChanged();
 }

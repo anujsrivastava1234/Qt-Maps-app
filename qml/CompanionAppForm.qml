@@ -136,6 +136,13 @@ Item {
         }
     }
 
+    Text {
+                        padding: 5
+                        width: parent.width
+                        wrapMode: Text.Wrap
+                        text: appBackend.textString
+                    }
+
     Component.onCompleted: {
         model.mapView = view;
     }
