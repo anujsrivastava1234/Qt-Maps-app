@@ -12,6 +12,10 @@ Item {
         id: view
         anchors.fill: parent
         focus: true
+        Component.onCompleted: {
+                    // Set and keep the focus on MapView to enable keyboard navigation
+                    forceActiveFocus();
+        }
     }
 
     // Search Overlay Container
@@ -131,6 +135,13 @@ Item {
             }
         }
     }
+
+    Text {
+                        padding: 5
+                        width: parent.width
+                        wrapMode: Text.Wrap
+                        text: appBackend.textString
+                    }
 
     Component.onCompleted: {
         model.mapView = view;

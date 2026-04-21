@@ -128,6 +128,44 @@ ApplicationWindow {
             id: appBackend
         }
 
+        ColumnLayout {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottomMargin: 32
+            z: 10
+            spacing: 8
+
+            Text {
+                padding: 5
+                width: parent.width
+                wrapMode: Text.Wrap
+                text: appBackend.textString
+            }
+
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 12
+
+                Button {
+                    text: "Navigate"
+                    enabled: appBackend.navigationEnabled
+                    onClicked: appBackend.startNavigation()
+                }
+
+                Button {
+                    text: "Recenter"
+                    enabled: appBackend.recenterEnabled
+                    onClicked: appBackend.recenterMap()
+                }
+
+                Button{
+                    text: "Simulation Mode"
+                    enabled: appBackend.navigationEnabled
+                    onClicked: appBackend.startSimulation()
+                }
+            }
+        }
+
         PortalUserInfo{
             id: userInfo
         }
@@ -262,7 +300,7 @@ ApplicationWindow {
                     buttonName: qsTr("Profile")
                     onBtnClicked: function(){
                         stackView.opacity = 1
-                                stackView.visible = true
+                        stackView.visible = true
                         console.log("Profile Button is clicked")
                         stackView.z = 2000; // Bring stack to front over the map
                         stackView.push(profileComponent)

@@ -28,6 +28,10 @@ class ExportVectorTilesTask;
 class ExportVectorTilesJob;
 class PortalItem;
 class OfflineMapTask;
+class RouteParameters;
+class RouteTask;
+class RouteTracker;
+class SimulatedLocationDataSource;
 } // namespace Esri::ArcGISRuntime
 
 #include <QObject>
@@ -36,6 +40,14 @@ Q_MOC_INCLUDE("MapQuickView.h")
 
 #include <QAbstractListModel>
 #include "GeocodeParameters.h"
+#include "Route.h"
+#include "DirectionManeuver.h"
+#include "RouteParameters.h"
+#include "RouteResult.h"
+
+class QTextToSpeech;
+
+
 
 enum MapTypes{
     STANDARD = 0,
@@ -56,6 +68,12 @@ class CompanionApp : public QObject
     Q_PROPERTY(bool offlineModeEnabled READ offlineModeEnabled WRITE setOfflineModeEnabled NOTIFY offlineModeEnabledChanged FINAL)
     Q_PROPERTY(int mapType READ mapType WRITE setMapType NOTIFY mapTypeChanged)
     Q_PROPERTY(QAbstractListModel* suggestions READ suggestions  NOTIFY suggestionsChanged FINAL)
+
+    //----------------------------------- Navigation API ---------------------------------------//
+    Q_PROPERTY(bool navigationEnabled READ navigationEnabled WRITE setNavigationEnabled NOTIFY navigationEnabledChanged FINAL)
+    Q_PROPERTY(bool recenterEnabled READ recenterEnabled WRITE setRecenterEnabled NOTIFY recenterEnabledChanged FINAL)
+    Q_PROPERTY(QString textString READ textString WRITE setTextString NOTIFY textStringChanged FINAL)
+    Q_PROPERTY(bool simulationMode READ simulationMode WRITE setSimulationMode NOTIFY simulationModeChanged FINAL)
 
 public:
     explicit CompanionApp(QObject *parent = nullptr);
@@ -79,6 +97,10 @@ public:
     Q_INVOKABLE void clearGraphics();
     Q_INVOKABLE void setSuggestions(const QString& text);
 
+    Q_INVOKABLE void startNavigation();
+    Q_INVOKABLE void recenterMap();
+    Q_INVOKABLE void startSimulation();
+
     bool offlineModeEnabled() const;
     void setOfflineModeEnabled(bool newOfflineModeEnabled);
 
@@ -89,6 +111,20 @@ public:
 
     QAbstractListModel *suggestions() const;
 
+    bool navigationEnabled() const;
+    void setNavigationEnabled(bool newNavigationEnabled);
+
+    bool recenterEnabled() const;
+    void setRecenterEnabled(bool newRecenterEnabled);
+
+    QString textString() const;
+    void setTextString(const QString &newTextString);
+
+    void initializeRoute();
+    void connectRouteTrackerSignals();
+
+    bool simulationMode() const;
+    void setSimulationMode(bool newSimulationMode);
 
 signals:
     void mapViewChanged();
@@ -99,6 +135,11 @@ signals:
     void mapTypeChanged();
     void hideSuggestionView();
     void suggestionsChanged();
+    void navigationEnabledChanged();
+    void recenterEnabledChanged();
+    void textStringChanged();
+
+    void simulationModeChanged();
 
 private:
     Esri::ArcGISRuntime::MapQuickView *mapView() const;
@@ -107,16 +148,10 @@ private:
     Esri::ArcGISRuntime::Map *m_map = nullptr;
     Esri::ArcGISRuntime::MapQuickView *m_mapView = nullptr;
     Esri::ArcGISRuntime::ExportVectorTilesTask *m_exportTask = nullptr;
-    bool m_isTracking = false;
     void exportVectorTile(Esri::ArcGISRuntime::ArcGISVectorTiledLayer *layer);
-    bool m_nightModeEnabled = false;
     Esri::ArcGISRuntime::ExportVectorTilesJob *m_exportJob = nullptr;
     Esri::ArcGISRuntime::PortalItem *m_portalItem = nullptr;
     Esri::ArcGISRuntime::OfflineMapTask *m_offlinemapTask = nullptr;
-
-    int m_downloadProgress{0};
-    bool m_offlineModeEnabled = false;
-    int m_mapType = 0;
 
     //Search bar model
     void configureGraphics();
@@ -127,6 +162,30 @@ private:
     Esri::ArcGISRuntime::TextSymbol* m_textSymbol = nullptr;
     QAbstractListModel *m_suggestions = nullptr;
     Esri::ArcGISRuntime::GeocodeParameters m_geocodeParams;
+
+    //-----------Routing--------------//
+    Esri::ArcGISRuntime::Graphic* m_routeAheadGrapghics = nullptr;
+    Esri::ArcGISRuntime::Graphic* m_routeTravelledGraphics = nullptr;
+    Esri::ArcGISRuntime::GraphicsOverlay* m_routeOverlay = nullptr;
+    Esri::ArcGISRuntime::RouteTask *m_routeTask = nullptr;
+    Esri::ArcGISRuntime::RouteResult m_routeResult;
+    Esri::ArcGISRuntime::Route m_route;
+    Esri::ArcGISRuntime::RouteTracker *m_routeTracker = nullptr;
+    Esri::ArcGISRuntime::SimulatedLocationDataSource *m_simulatedLocationDataSource = nullptr;
+    Esri::ArcGISRuntime::RouteParameters m_routeparamters;
+    QList<Esri::ArcGISRuntime::DirectionManeuver>  m_directionManeuvers;
+    QTextToSpeech *m_speaker = nullptr;
+
+
+    bool m_isTracking = false;
+    bool m_nightModeEnabled = false;
+    int m_downloadProgress{0};
+    bool m_offlineModeEnabled = false;
+    int m_mapType = 0;
+    bool m_navigationEnabled = false;
+    bool m_recenterEnabled = true;
+    QString m_textString = "";
+    bool m_simulationMode = false;
 };
 
 #endif // COMPANIONAPP_H

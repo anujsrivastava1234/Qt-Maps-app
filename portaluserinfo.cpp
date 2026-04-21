@@ -12,8 +12,6 @@
 
 using namespace Esri::ArcGISRuntime;
 using namespace Esri::ArcGISRuntime::Authentication;
-
-
 const QString PortalUserInfo::UNKNOWN = "Unknown";
 
 PortalUserInfo::PortalUserInfo(QObject *parent)
@@ -33,8 +31,6 @@ QString PortalUserInfo::fullName() const
     return "John Doe";
 }
 
-
-
 QString PortalUserInfo::email() const
 {
     if (m_user)
@@ -42,7 +38,6 @@ QString PortalUserInfo::email() const
 
     return "john@gmail.com";
 }
-
 
 void PortalUserInfo::onPortalLoadStatusChanged(Esri::ArcGISRuntime::LoadStatus loadStatus)
 {
