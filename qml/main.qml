@@ -136,14 +136,10 @@ ApplicationWindow {
             spacing: 8
 
             Text {
-                Layout.alignment: Qt.AlignHCenter
                 padding: 5
-                width: contentRoot.width
-                horizontalAlignment: Text.AlignHCenter
+                width: parent.width
                 wrapMode: Text.Wrap
                 text: appBackend.textString
-                color: "red"
-                //visible: appBackend.textString !== ""
             }
 
             RowLayout {
@@ -304,7 +300,7 @@ ApplicationWindow {
                     buttonName: qsTr("Profile")
                     onBtnClicked: function(){
                         stackView.opacity = 1
-                                stackView.visible = true
+                        stackView.visible = true
                         console.log("Profile Button is clicked")
                         stackView.z = 2000; // Bring stack to front over the map
                         stackView.push(profileComponent)
