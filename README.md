@@ -35,9 +35,7 @@ This app focuses on smooth UI, offline capabilities, and flexible map visualizat
 
 ## 📸 Demo (Click to view YT Demo Video)
 
-> [![Mapify Demo](<img width="381" height="784" alt="Screenshot 2026-05-04 at 4 17 15 PM" src="https://github.com/user-attachments/assets/6e7cc381-a0b8-430f-ab25-7111928efa7f" />)]
-(http://youtube.com/watch?v=HD73J_4yeYU&t=22s)
-
+[![Mapify Demo](https://github.com/user-attachments/assets/6e7cc381-a0b8-430f-ab25-7111928efa7f)](https://www.youtube.com/watch?v=HD73J_4yeYU&t=22s)
 
 ### 🏠 Main Map View
 
